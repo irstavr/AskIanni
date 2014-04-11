@@ -7,7 +7,7 @@ import java.util.LinkedList;
 public class Document {
 	private static long nextID = 1;
 
-	private long documentID;
+	private Long documentID;
 	private String documentName;
 	private String documentPath;
 	private String documentFormat;
@@ -48,7 +48,7 @@ public class Document {
 		return this.documentFormat;
 	}
 
-	public long getDocumentID() {
+	public Long getDocumentID() {
 		return this.documentID;
 	}
 
