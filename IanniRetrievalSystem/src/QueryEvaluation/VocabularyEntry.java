@@ -9,12 +9,12 @@ public class VocabularyEntry {
 
 	private long df;
 	private int posStart;
-	private int posEnd;
+	private int bytesLength;
 	
-	public VocabularyEntry(long df, int start, int end) {
+	public VocabularyEntry(long df, int start, int bytesLength) {
 		this.setDf(df);
 		this.setPosStart(start);
-		this.setPosEnd(end);
+		this.setBytesLength(bytesLength);
 	}
 
 	public long getDf() {
@@ -33,12 +33,12 @@ public class VocabularyEntry {
 		this.posStart = posStart;
 	}
 
-	public int getPosEnd() {
-		return posEnd;
+	public int getBytesLength() {
+		return bytesLength;
 	}
 
-	public void setPosEnd(int posEnd) {
-		this.posEnd = posEnd;
+	public void setBytesLength(int bytesLength) {
+		this.bytesLength = bytesLength;
 	}
 
 }
