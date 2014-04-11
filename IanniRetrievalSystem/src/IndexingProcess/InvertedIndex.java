@@ -16,14 +16,14 @@ import java.util.TreeSet;
 public class InvertedIndex implements java.io.Serializable{
 	
 	private SortedSet<Document> index;	/* actual inverted index - lists of words in the inverted index*/
-	private ArrayList<Document> documentList;					/* stores structured info about each doc */
+	private HashMap<String,Document> documents;					/* stores structured info about each doc */
 
 	/* constructor initializes by setting up the Document object 
 	 * instantiates a null HashMap, called index.
 	 */ 
 	InvertedIndex () {
 		index = new TreeSet<Document>(new DocComparator());
-		documentList = new ArrayList<Document>();		
+		documents = new HashMap<String,Document>();		
 	}
 	/***
 	 * TAKE A LOOK 
@@ -48,51 +48,11 @@ public class InvertedIndex implements java.io.Serializable{
 	  
 	}
 
-/*	
- 
-  
- *   words 	 = d.getWords();       			 get current words map   
-	    wordsSet = words.keySet();				 get all the words objects
 
-	     loop through the words and add them to the index 
-	    Iterator<String> i = wordsSet.iterator(); 
-	    while (i.hasNext()) {
-	          word = (String) i.next();
-
-	           if we have the word, just get the existing posting list 
-	          if (index.containsKey(word)) {
-	             postingList = index.get(word); 
-	          } else {
-	              otherwise, add the word and then create new posting list 
-	             postingList = new LinkedList<PostingListNode>(); 	//instantiate a null linked list
-	           //  index.put(key, value)(word, postingList); 	//associates the null list with the index HashMap
-	          }
-
-	           at this point, the word we are adding
-	           * has a postingList associated with it
-	           
-	       //   LinkedList<Integer> positions = word.getPosList().get(d);
-
-	           now add this word to the posting list  
-	        //  tf = (WordFrequency) words.get(word);
-	          
-	       //   PostingListNode currentNode = new PostingListNode(positions, tf);
-	         // postingList.add(currentNode);
-	    }*/
 	/* Writes the index to disk */
 	public void write() {
 		FileOutputStream ostream = null; 
 		ObjectOutputStream p = null; 
-		HashMap<String, String> map1 = new HashMap<String, String>();
-		map1.put("1", "1");
-		map1.put("2", "3");
-		map1.put("3", "3");
-		HashMap<String, String> map2 = new HashMap<String, String>();
-		map2.put("4", "4");
-		map2.put("5", "6");
-		HashMap<String, String> map3 = new HashMap<String, String>();
-		map3.putAll(map1);
-		map3.putAll(map2);
 		/* output file location is identified from the configuration file */
 		String outputFile = "PostingFile.txt"; 
 		
@@ -108,7 +68,7 @@ public class InvertedIndex implements java.io.Serializable{
 	 
 		/* write object to the disk */
 		try {
-			p.writeObject(map3);
+			p.writeObject(this.index);
 			p.flush();
 			p.close();
 			System.out.println("Inverted index written to file ==> "+ outputFile);
@@ -147,13 +107,13 @@ public class InvertedIndex implements java.io.Serializable{
 	}
 
 	/* copies the list of documents into the InvertedIndex Object */
-	public void setDocumentList(ArrayList<Document> documentList2) {
-		this.documentList = documentList2;
+	public void setDocumentList(HashMap<String,Document> documents) {
+		this.documents = documents;
 	} 
 	
 	/* returns the documents list for the index */
-	public ArrayList<Document> getDocumentsList() {
-		return this.documentList;
+	public HashMap<String,Document> getDocumentsList() {
+		return this.documents;
 	}
 	
 	/* returns the inverted index */

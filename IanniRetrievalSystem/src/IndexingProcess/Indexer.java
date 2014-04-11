@@ -1,15 +1,19 @@
 package IndexingProcess;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.io.RandomAccessFile;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.SortedSet;
 import java.util.TreeMap;
-import java.util.TreeSet;
-
 
 /* This class builds the inverted index.
  * 
@@ -24,138 +28,199 @@ import java.util.TreeSet;
  */
 public class Indexer {
 
-	private static ArrayList<Document> documentList = new ArrayList<Document>(); 
-	private static TreeMap<String, Integer> vocabulary = new TreeMap<String,Integer>();
-	
-	public static void main (String[] args) throws IOException {			
-		//B6. builds PostingFile
-		//It follows the parsing, stemming(B3) and analyzing
-		//of multiple documents (B2)
-		InvertedIndex invertedIndex = buildInvertedIndex();
-		
-		SortedSet<Document> index =  invertedIndex.getIndex();
-		
-		//B1. print number of different words of the input files
-		//printNumOfDiffWords(index);
-		
-		//B1. print every different word and its word_freq
-		printVocabulary();
-		printPostingList(index);
-		//B4. build VocabularyFile
-		//buildVocabularyFile(index);	
-		
-		//B5. build DocumentFile
-		//buildDocumentFile();
-	}
-		
-	/* Returns the size of keys of the index (sum of diff words) */
-	private static void printNumOfDiffWords(HashMap<Word,LinkedList<PostingListNode>> index) {		
-		System.out.println("#Num_of_diff_words: "+ index.keySet().size());
-	}
-	
-	/* for every word print the frequency of its occurrences */
-	private static void printVocabulary() {
-		
-		System.out.println("Vocabulary : ");
-		for(String str : vocabulary.keySet())
-		{
-			System.out.println("Str : " + str + "\t\t\t | Freq : " + vocabulary.get(str) );
-		}
+	private static final String VOCABULARY = "VocabularyFile.txt";
+	private static final String POSTING = "PostingFile.txt";
+	private static final String DOCUMENT = "DocumentsFile.txt";
 
+	private static HashMap<String,Document> documents;
+	private static TreeMap<String, Integer> vocabulary;
+	// temporary
+	static OutputStream fw;
+	static PrintStream ps;
+	static BufferedWriter bw = null;
+
+	public static void main(String[] args) throws IOException {
+
+		createFolder();
+		// B6. builds PostingFile
+		// It follows the parsing, stemming(B3) and analyzing
+		// of multiple documents (B2)
+		InvertedIndex invertedIndex = buildInvertedIndex();
+
+		SortedSet<Document> index = invertedIndex.getIndex();
+
+		// B1. print number of different words of the input files
+		// printNumOfDiffWords(index);
+
+		printPostingList(index);
+		// B4. build VocabularyFile
+		// buildVocabularyFile(index);
+
+		// B5. build DocumentFile
+		// buildDocumentFile();
 	}
-	
-	private static void printPostingList(SortedSet<Document> index)
-	{
-		System.out.println("\nPosting file : ");
-		for(String word : vocabulary.keySet())
-		{
-			for(Document doc : index)
-			{
-			
-				if(doc.getPosList().containsKey(word))
-				{
-					System.out.print("Doc : " + doc.getDocumentID());
-					System.out.print("\t Word : " + word);
-					System.out.print("\t Position List size : " + doc.getPosList().get(word).size() + "\t\t[");
-					for(int i = 0; i < doc.getPosList().get(word).size(); i++)
-					{
-						System.out.print(" i : " + doc.getPosList().get(word).get(i) +"   ");
+
+	/* Returns the size of keys of the index (sum of diff words) */
+	private static void printNumOfDiffWords(
+			HashMap<Word, LinkedList<PostingListNode>> index) {
+		System.out.println("#Num_of_diff_words: " + index.keySet().size());
+	}
+
+
+
+	private static void printPostingList(SortedSet<Document> index) {
+		
+
+		StringBuilder postLine = new StringBuilder();
+		StringBuilder vocLine = new StringBuilder();
+		int nextPos = 0;
+		
+		//create files
+		createFile(POSTING);
+		createFile(VOCABULARY);
+		
+		
+		for (String word : vocabulary.keySet()) {
+			postLine = new StringBuilder();
+			for  (Entry<String, Document> entry : documents.entrySet()) {
+				Document doc = entry.getValue();
+				if (doc.getPosList().containsKey(word)) {
+					//postLine += String.format("%5d \t %-15s \t", doc.getDocumentID(), word);
+					postLine.append(doc.getDocumentID()).append("\t").append(word).append("\t");
+					for (int i = 0; i < doc.getPosList().get(word).size(); i++) {
+						//postLine += String.format("%3d", doc.getPosList().get(word).get(i));
+						postLine.append(doc.getPosList().get(word).get(i)).append(" ");
 					}
-					System.out.println("]\t");
+					//postLine += "\n";
+					postLine.append("\n");
 				}
 			}
-			System.out.println("");
+			//System.out.println("Line.len = " + line.length() + "\n" + line);
+			// postline += doc.getLeng
+			//System.out.println("Post" + postLine.toString());
+			writeToFile(POSTING, postLine.toString() , nextPos);
+
+			//System.out.printf("%-15s  \t %3d \t %3d \t %3d\n", word, vocabulary.get(word),nextPos, postLine.length());
+			vocLine.append(word).append("\t").append(vocabulary.get(word)).append("\t").append(nextPos).append(" ").append(postLine.length()).append("\n");
+			//next Position for posting File
+			nextPos += postLine.length() + 1;			
+
+		}
+		System.out.println("vocLine : \n" + vocLine.length());
+		writeToFile(VOCABULARY,vocLine.toString(),0);
+		
+		
+		
+		
+		//test reading from file
+		try {
+			System.out.println("\n\n\n******REading:");
+			//readFromFile(POSTING,0 ,line.length());
+			System.out.println(readFromFile(POSTING,0,170));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+		//at this point we may clear all collections we have created before except Vocabulary
+	}
+
+
+
+	private static void createFolder() {
+		File file = new File("CollectionIndex");
+		if (!file.exists()) {
+			if (file.mkdir()) {
+				System.out.println("Directory is created!");
+			} else {
+				System.out.println("Failed to create directory!");
+			}
 		}
 	}
-	/* builds the DocumentFile.txt that contains
-	 * for every Document its id,path,format,norma
-	 */
-	private static void buildDocumentFile() {
-		//we save every of this info on Document
-		//we just parse documentList ;)
-		//bingo
+
+	private static void createFile(String outputFile) {
+
+		/* output file location is identified from the configuration file */
+		RandomAccessFile file = null;
+		try {
+			file = new RandomAccessFile("CollectionIndex\\" + outputFile, "rw");
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
-	/* builds the VocabularyFile.txt that contains
-	 * every Word, the doc_freq and point_to_index.
-	 */
-	private static void buildVocabularyFile(HashMap<Word,LinkedList<PostingListNode>> index) {
-		// exoume hdh oles tis diaforetikes lexeis sto postingFile
-		// me ena iteration exoume k to doc_freq k to pos sto postingFile
-		// polu eukola
-	
-		//se auxousa seira
-	}
+	private static void writeToFile(String filePath, String str,
+			int position) {
+		RandomAccessFile file;
+		try {
+			file = new RandomAccessFile(filePath, "rw");
+			file.seek(position);
+			file.write(str.getBytes());
+			file.close();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
-	/* Builds the inverted index, reads all documents */ 
-	 public static InvertedIndex buildInvertedIndex () throws IOException {	 
-		Document d;
 		
+	}
+
+	private static String readFromFile(String filePath, int position, int size)
+			throws IOException {
+
+		RandomAccessFile file = new RandomAccessFile(filePath, "r");
+		file.seek(position);
+		byte[] bytes = new byte[size];
+		file.read(bytes);
+		System.out.println("File Length : " + file.length());
+		file.close();
+		return new String( bytes);
+
+	}
+	private static void closeFile(RandomAccessFile file) {
+		try {
+			file.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	/* Builds the inverted index, reads all documents */
+	public static InvertedIndex buildInvertedIndex() throws IOException {
+		Document d;
+
 		/* Input Files */
 		File dir = new File("documentCollection");
-        File[] inputFiles = dir.listFiles();
-            
-		InvertedIndex index = new InvertedIndex(); 
-		index.clear();
-		
-		/* now lets parse the input file
-		 * we call the parser that returns a set of Document objects
-		 */
-	
-		Parser parser = new Parser(inputFiles);
-		
-		
-		vocabulary = parser.readDocuments( vocabulary);
-		///////////////////////
-		
-		
-		documentList =  parser.getDocsList();
-			
-		/* put the document list into the InvertedIndex */
-		index.setDocumentList(documentList);
-		 
-		/* we iterate all the Documents that we parsed and
-		 * call the 'add' method to add them to the InvertedIndex.
-		 */
-		
-		Iterator<Document> i = documentList.iterator();
-		System.out.println("Starting to build the index");
-		
-		while ( i.hasNext() ) { 
-			 d = (Document) i.next(); 
-			// System.out.println("Document : " + d.getDocumentID() + " |Words : " + d.getWords().size());
-			//this is your INDEX EIRINI :P 
-			// System.out.println("Document i :" + d.getDocumentID() + " Words Count" + d.getWords().size());
-		 	index.add(d); 
-		} 
+		File[] inputFiles = dir.listFiles();
 
+		InvertedIndex index = new InvertedIndex();
+		index.clear();
+
+		/*
+		 * now lets parse the input file we call the parser that returns a set
+		 * of Document objects
+		 */
+
+		Parser parser = new Parser(inputFiles);
+		parser.readDocuments();
+		documents = parser.getDocsList();
+		vocabulary = parser.getVocabulary();
 		
-		//PRINT IND TREEMAP - VOCABULARY
-	
-		
-		/* store InvertedIndex to disk */
-		index.write(); 		// write the index to a file
-		 
-		return index; 
-	 }
+		/* put the document list into the InvertedIndex */
+		index.setDocumentList(documents);
+
+	/*	for (Entry<String, Document> entry : documents.entrySet()) {
+		    System.out.print("key,val: ");
+		    System.out.println(entry.getKey() + "," + entry.getValue().getDocumentID());
+		    index.add(entry.getValue());
+		}*/
+
+		return index;
+	}
 }

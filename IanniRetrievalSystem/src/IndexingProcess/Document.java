@@ -15,6 +15,8 @@ public class Document {
 	private int wordsCounter;
 	private double norma;
 	private HashMap<String, ArrayList<Integer>> posList;
+	private int docsLineSize;
+	private int docsLinePos;
 
 	public Document(String name, String path) {
 		this.documentID = getNextId(); /* for auto-increment */
@@ -29,6 +31,13 @@ public class Document {
 		this.posList = new HashMap<String, ArrayList<Integer>>();
 		this.wordsCounter = 0;
 		this.norma = 0;
+		
+		StringBuilder s = new StringBuilder()
+		.append(Long.toString(this.documentID)).append("\t")
+		.append(this.documentPath).append("\t").append("\t")
+		.append(this.getDocumentFormat()).append("\n");
+		
+		docsLineSize = s.length();
 	}
 
 	public void addWord(String word, Word freq) {
@@ -97,7 +106,7 @@ public class Document {
 
 	public void setPosList(String word, int pos) {
 
-		//System.out.println("Word : " + word + " Pos: " + pos);
+		// System.out.println("Word : " + word + " Pos: " + pos);
 		if (posList.containsKey(word)) {
 			ArrayList<Integer> listPos = posList.get(word);
 			listPos.add(pos);
@@ -108,13 +117,34 @@ public class Document {
 			listPos.add(pos);
 			posList.put(word, listPos);
 		}
-		
-		for(String  s : posList.keySet())
-		{
-			for(int i = 0; i < posList.get(s).size(); i++)
+
+		for (String s : posList.keySet()) {
+			for (int i = 0; i < posList.get(s).size(); i++)
 				;
-				//System.out.println("Word : " + s + posList.get(s).get(i));
-			
+			// System.out.println("Word : " + s + posList.get(s).get(i));
+
 		}
+	}
+
+	public int getDocBytes() {
+		return 1;
+	}
+
+	public int getDocsLinePos() {
+		return docsLinePos;
+	}
+
+	public void setDocsLinePos(int docsLinePos) {
+		this.docsLinePos = docsLinePos;
+	}
+
+	public int getDocsLineSize() {
+		
+		
+		return docsLineSize;
+	}
+
+	public void setDocsLineSize(int docsLineSize) {
+		this.docsLineSize = docsLineSize;
 	}
 }

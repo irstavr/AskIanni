@@ -10,9 +10,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.SortedSet;
 import java.util.StringTokenizer;
 import java.util.TreeMap;
 
@@ -23,28 +20,30 @@ import mitos.stemmer.Stemmer;
  * its results are sent to the index builder.
  */
 public class Parser {
-	ArrayList<Document> docsList;
+	private HashMap<String,Document> docsMap;
+	private TreeMap<String, Integer> vocabulary;
 	private File[] inputFiles;
-	private ArrayList<String> stopWords;
+	private HashMap<String,Integer> stopWords;
 	private final static Charset ENCODING = StandardCharsets.UTF_8;  
 
 
 	/* accepts as a parameter the file to parse and the stop words to use */
 	public Parser(File[] inputFiles) throws IOException {
-		this.docsList   = new ArrayList<Document>();
+		this.docsMap   = new HashMap<String, Document>();
 		this.inputFiles = inputFiles;
 		this.stopWords  = readStopWordFiles();
+		this.setVocabulary(new TreeMap<String, Integer>());
 	}
 
 	/* read and parse, analyze, stem the documents */
-	public TreeMap<String, Integer> readDocuments(TreeMap<String, Integer> vocabulary) throws IOException {
+	public  void readDocuments() throws IOException {
 		//parsing file
-		parse(vocabulary);
+		parse();
 		//stop words analyzer
 		stopWordsAnalyzer();
 		//run stemmer
 		runStemmer();
-		return vocabulary;
+	
 
 	
 	}
@@ -60,9 +59,9 @@ public class Parser {
 	}
 
 	/* parsing files and erase every whitespace,number,sign */	
-	private TreeMap<String, Integer> parse(TreeMap<String, Integer> vocabulary) throws IOException {
+	private  void parse() throws IOException {
     	String delimiter = " ~\t\n\r\f1234567890";
-    	
+		//String delimiter = "\t\n\r\f!@#$%^&*;:'\".,0123456789()_-[]{}<>?|~`+-=/ \'\b«»§΄―—’‘–°· \\";
     	
         for (File f : inputFiles) {
         	//RandomAccessFile randomFile = new RandomAccessFile(f.getAbsolutePath(),"rw");
@@ -76,8 +75,6 @@ public class Parser {
 
 			//Create new Document for this file and add it to the list
 			Document d = new Document(f.getName(), f.getAbsolutePath());
-			
-
 			// Start looping through the file
         	while ( (line = bufReader.readLine()) != null) {
         		tokenizer = new StringTokenizer(line, delimiter);
@@ -134,11 +131,14 @@ public class Parser {
         				//this iteration updates the docfreq-wordfreq
         				//for our vocabulary and generally from the doclist
         				//we 're going to create our posting file.
-        				for(Document tdoc : docsList)
+        				HashMap<String,Word> docWords = null;
+        				for(String tdoc : docsMap.keySet())
         				{
-        					if(tdoc.getWords().containsKey(token)){	
-        						tdoc.getWords().get(token).incrementDocFreq();
-        						tdoc.getWords().get(token).incrementWordFreq();	
+        					docWords =  docsMap.get(tdoc).getWords();
+        					if(docWords.containsKey(token)){
+        						Word docWord = docWords.get(token);
+        						docWord.incrementDocFreq();
+        						docWord.incrementWordFreq();	
         					}
         			
         					
@@ -167,11 +167,10 @@ public class Parser {
         	}
         	bufReader.close();
         	wordPos = 0;
-        	docsList.add(d);
+        	
+        	docsMap.put(Long.toString(d.getDocumentID()), d);
         }
-        
-       
-        return vocabulary;
+        System.out.println("Vocabulary size"  + vocabulary.size());
 	}
 
 	private Word isWordOnMapOfWords(String token, HashMap<String, Word> hashMap) {
@@ -184,25 +183,25 @@ public class Parser {
 	}
 
 	/* Returns a list of all the stop words from both GR+EN files */
-	private static ArrayList<String> readStopWordFiles() throws IOException {
+	private static HashMap<String, Integer> readStopWordFiles() throws IOException {
 		FileReader fileReaderGr = new FileReader("stopwordsGr.txt");
 		FileReader fileReaderEn = new FileReader("stopwordsEn.txt");
 
         BufferedReader bufferedReaderGr = new BufferedReader(fileReaderGr);
         BufferedReader bufferedReaderEn = new BufferedReader(fileReaderEn);
         
-        ArrayList<String> stopWords = new ArrayList<String>();
+        HashMap<String,Integer> stopWords = new HashMap<String,Integer>();
         String stopWordGr, stopWordEn = null;
         
         // parse stopWordsGr
         while ( (stopWordGr = bufferedReaderGr.readLine()) != null ) {
-        	stopWords.add(stopWordGr);		//add stop word to list
+        	stopWords.put(stopWordGr, stopWordGr.length());		//add stop word to list
         }
         bufferedReaderGr.close();
         
         // parse stopWordsEn
         while ( (stopWordEn = bufferedReaderEn.readLine()) != null ) {
-        	stopWords.add(stopWordEn);		//add stop word to list
+        	stopWords.put(stopWordEn, stopWordEn.length());		//add stop word to list
         }
         bufferedReaderEn.close();
         
@@ -211,7 +210,7 @@ public class Parser {
 	
 	/* Check if word given is a stopWord */
 	boolean isStopWord(String word) {
-		if (!stopWords.contains(word)) {
+		if (!stopWords.containsKey(word)) {
 			return false;
 		} else {
 	    	return true;
@@ -226,17 +225,25 @@ public class Parser {
 		this.inputFiles = inputFiles;
 	}
 	
-	public ArrayList<String> getStopWords() {
+	public HashMap<String, Integer> getStopWords() {
 		return stopWords;
 	}
 	
 	
-	public ArrayList<Document> getDocsList() {
-		return docsList;
+	public HashMap<String, Document> getDocsList() {
+		return docsMap;
 	}
 
-	public void setDocsList(ArrayList<Document> docsList) {
-		this.docsList = docsList;
+	public void setDocsList(HashMap<String, Document> docsMap) {
+		this.docsMap = docsMap;
+	}
+
+	public TreeMap<String, Integer> getVocabulary() {
+		return vocabulary;
+	}
+
+	public void setVocabulary(TreeMap<String, Integer> vocabulary) {
+		this.vocabulary = vocabulary;
 	}
 
 	
