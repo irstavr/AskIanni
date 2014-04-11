@@ -1,0 +1,6 @@
+apartements 1  0 180
+boats 1  180 0
+cars 1  180 0
+rent 1  180 0
+yachts 1  180 0
+

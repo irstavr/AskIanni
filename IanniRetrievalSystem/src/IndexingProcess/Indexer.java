@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.RandomAccessFile;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -28,9 +30,9 @@ import java.util.TreeMap;
  */
 public class Indexer {
 
-	private static final String VOCABULARY = "VocabularyFile.txt";
-	private static final String POSTING = "PostingFile.txt";
-	private static final String DOCUMENT = "DocumentsFile.txt";
+	private static final String VOCABULARY = "CollectionIndex\\VocabularyFile.txt";
+	private static final String POSTING = "CollectionIndex\\PostingFile.txt";
+	private static final String DOCUMENT = "CollectionIndex\\DocumentsFile.txt";
 
 	private static HashMap<String,Document> documents;
 	private static TreeMap<String, Integer> vocabulary;
@@ -49,15 +51,9 @@ public class Indexer {
 
 		SortedSet<Document> index = invertedIndex.getIndex();
 
-		// B1. print number of different words of the input files
-		// printNumOfDiffWords(index);
 
-		printPostingList(index);
-		// B4. build VocabularyFile
-		// buildVocabularyFile(index);
+		createAllFiles();
 
-		// B5. build DocumentFile
-		// buildDocumentFile();
 	}
 
 	/* Returns the size of keys of the index (sum of diff words) */
@@ -68,12 +64,13 @@ public class Indexer {
 
 
 
-	private static void printPostingList(SortedSet<Document> index) {
+	private static void createAllFiles() throws IOException {
 		
 
-		StringBuilder postLine = new StringBuilder();
-		StringBuilder vocLine = new StringBuilder();
 		int nextPos = 0;
+		int prevPos = 0;
+		RandomAccessFile postingFile = new RandomAccessFile(POSTING, "rw");
+		RandomAccessFile vocabularyFile = new RandomAccessFile(VOCABULARY, "rw");
 		
 		//create files
 		createFile(POSTING);
@@ -81,49 +78,41 @@ public class Indexer {
 		
 		
 		for (String word : vocabulary.keySet()) {
-			postLine = new StringBuilder();
 			for  (Entry<String, Document> entry : documents.entrySet()) {
 				Document doc = entry.getValue();
-				if (doc.getPosList().containsKey(word)) {
-					//postLine += String.format("%5d \t %-15s \t", doc.getDocumentID(), word);
-					postLine.append(doc.getDocumentID()).append("\t").append(word).append("\t");
-					for (int i = 0; i < doc.getPosList().get(word).size(); i++) {
-						//postLine += String.format("%3d", doc.getPosList().get(word).get(i));
-						postLine.append(doc.getPosList().get(word).get(i)).append(" ");
+				HashMap<String,ArrayList<Integer>> docPosList = doc.getPosList(); 
+				if (docPosList.containsKey(word)) {
+					postingFile.write(Long.toString(doc.getDocumentID()).getBytes(Charset.forName("UTF-8")));
+					postingFile.write((" " + word + " ").getBytes(Charset.forName("UTF-8")));
+					ArrayList<Integer> wordList = docPosList.get(word);
+					for (int i = 0; i < wordList.size(); i++) {
+						postingFile.write((" " + Integer.toString(wordList.get(i))).getBytes(Charset.forName("UTF-8")));
 					}
-					//postLine += "\n";
-					postLine.append("\n");
-				}
+					postingFile.write(System.getProperty("line.separator").getBytes(Charset.forName("UTF-8")));
+				}	
 			}
-			//System.out.println("Line.len = " + line.length() + "\n" + line);
-			// postline += doc.getLeng
-			//System.out.println("Post" + postLine.toString());
-			writeToFile(POSTING, postLine.toString() , nextPos);
-
-			//System.out.printf("%-15s  \t %3d \t %3d \t %3d\n", word, vocabulary.get(word),nextPos, postLine.length());
-			vocLine.append(word).append("\t").append(vocabulary.get(word)).append("\t").append(nextPos).append(" ").append(postLine.length()).append("\n");
-			//next Position for posting File
-			nextPos += postLine.length() + 1;			
-
+			prevPos = nextPos;
+			nextPos = (int) postingFile.length();	
+			
+			System.out.println("Write Length : " + prevPos + "  " + nextPos);
+			vocabularyFile.write((word + " ").getBytes(Charset.forName("UTF-8")));
+			vocabularyFile.write((vocabulary.get(word) + " ").getBytes(Charset.forName("UTF-8")));
+			vocabularyFile.write((" " + Integer.toString(prevPos)).getBytes(Charset.forName("UTF-8")));
+			vocabularyFile.write((" " + Integer.toString(nextPos-prevPos)).getBytes(Charset.forName("UTF-8")));
+			vocabularyFile.write(System.getProperty("line.separator").getBytes(Charset.forName("UTF-8")));
 		}
-		System.out.println("vocLine : \n" + vocLine.length());
-		writeToFile(VOCABULARY,vocLine.toString(),0);
-		
-		
-		
-		
 		//test reading from file
 		try {
 			System.out.println("\n\n\n******REading:");
 			//readFromFile(POSTING,0 ,line.length());
-			System.out.println(readFromFile(POSTING,0,170));
+			System.out.println(readFromFile(POSTING,141,39));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
-		
-		//at this point we may clear all collections we have created before except Vocabulary
+		postingFile.close();
+		vocabularyFile.close();
 	}
 
 
@@ -144,7 +133,7 @@ public class Indexer {
 		/* output file location is identified from the configuration file */
 		RandomAccessFile file = null;
 		try {
-			file = new RandomAccessFile("CollectionIndex\\" + outputFile, "rw");
+			file = new RandomAccessFile( outputFile, "rw");
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -157,7 +146,10 @@ public class Indexer {
 		try {
 			file = new RandomAccessFile(filePath, "rw");
 			file.seek(position);
-			file.write(str.getBytes());
+			//file.write(str);
+			//file.writeChars("str");
+			file.write("aek".getBytes(Charset.forName("UTF-8")));
+			System.out.println(file.length());
 			file.close();
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
