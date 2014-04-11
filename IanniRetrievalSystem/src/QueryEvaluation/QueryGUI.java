@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import javax.swing.ButtonGroup;
@@ -69,7 +71,12 @@ public class QueryGUI {
 		JButton SearchButton = new JButton("Search");
 		SearchButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent evt) {
-				SearchButtonActionPerformed(evt);
+				try {
+					SearchButtonActionPerformed(evt);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		});
 		
@@ -183,10 +190,9 @@ public class QueryGUI {
 		retrievalModel = 0;
 	}
 
-	protected void SearchButtonActionPerformed(ActionEvent evt) {
+	protected void SearchButtonActionPerformed(ActionEvent evt) throws IOException {
 		Vocabulary voc = new Vocabulary();
         RetrievalModel model = null;
-        QueryResults res = null;
 		HashMap<String,VocabularyEntry> vocabulary = null;
                 
         /* Start counting time */
@@ -195,19 +201,21 @@ public class QueryGUI {
         System.out.println("QueryEvaluator starts!");
 
         /* Load Vocabulary from File into memory */
-        voc.setVocabulary("CollectionIndex\\VocabularyFile.txt");
+        voc.setVocabulary("VocabularyFile.txt");
         vocabulary = voc.getVocabulary();        
 
-        /* According to user selected Retrieval model, instantiate it */
+        /* According to the selected Retrieval model by user, instantiate it */
         model = chooseRetrievalModel(retrievalModel, vocabulary);
         
         /* Retrieve the scores according to this model */
         ScoreEntry[] scoreEntry = model.evaluateQuery(queryField.getText());
         
         /* Get the query results */
-        res = new QueryResults(this,vocabulary, scoreEntry, queryField.getText());
+        System.out.println(">Query: "+queryField.getText());
+        QueryResults res = new QueryResults( vocabulary, scoreEntry, queryField.getText());
+        ArrayList<String> results = res.getResults();
         textArea.setEnabled(true);
-        textArea.setText(res.toString());
+        textArea.setText(results.toString());
         
         /* Stop counting time */
         stop = System.currentTimeMillis();
@@ -233,9 +241,9 @@ public class QueryGUI {
     }
 	
 	/* Print statistics of the program
-	 * time and size of results datas
+	 * time and size of results data
 	 */
 	private static void printStatistics(long l, Object res) {		// TO CHANGE: set res type!
-		System.out.println("Time passed:" + l + res.toString());	// res.LENGTH instad of toString!
+		System.out.println("Time passed:" + l + res.toString());	// res.LENGTH instead of toString!
 	}
 }
