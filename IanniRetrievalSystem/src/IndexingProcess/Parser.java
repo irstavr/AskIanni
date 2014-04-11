@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.RandomAccessFile;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -20,6 +21,7 @@ import mitos.stemmer.Stemmer;
  * its results are sent to the index builder.
  */
 public class Parser {
+	private static final String DOCUMENT = "CollectionIndex\\DocumentsFile.txt";
 	private HashMap<String,Document> docsMap;
 	private TreeMap<String, Integer> vocabulary;
 	private File[] inputFiles;
@@ -62,9 +64,10 @@ public class Parser {
 	private  void parse() throws IOException {
     	String delimiter = " ~\t\n\r\f1234567890";
 		//String delimiter = "\t\n\r\f!@#$%^&*;:'\".,0123456789()_-[]{}<>?|~`+-=/ \'\b«»§΄―—’‘–°· \\";
-    	
+    	int prevPos,nextPos = 0;
+    	RandomAccessFile docFile = new RandomAccessFile(DOCUMENT, "rw");
         for (File f : inputFiles) {
-        	//RandomAccessFile randomFile = new RandomAccessFile(f.getAbsolutePath(),"rw");
+        
         	InputStreamReader fileReader = new InputStreamReader(new FileInputStream(f), ENCODING.name());   	
         	BufferedReader bufReader = new BufferedReader(fileReader);
         	StringTokenizer tokenizer = null;
@@ -85,30 +88,22 @@ public class Parser {
         			wordPos++;
         			// increment wordsCounter of this Document
         			d.incrementWordsCounter();
-        			//### debug print
-        			//System.out.println("Token : " + token + "| WordPos : " + wordPos + "|  DocWordsCounter : " + d.getWordsCounter());
-        			
+        	
         			if(!isStopWord(token)){
         				Word word = isWordOnMapOfWords(token, d.getWords());
-  
- //PART1
+
         				if(word == null)
         				{
-        					//System.out.println("Rouggas");
         					word = new Word(token);
 	        				word.incrementDocFreq();
 	        				word.incrementWordFreq();
-	        				
 	        				ArrayList<Integer> positions = d.getPosList().get(token);
 	        				if ( positions == null ) {
             					positions = new ArrayList<Integer>();
             				}
-	        				
             				positions.add(wordPos.intValue());
             				d.setPosList(token, wordPos);
-            				
 	        				d.addWord(token, word);
-	        				
         				}
         				else{
         					word.incrementWordFreq();
@@ -116,21 +111,9 @@ public class Parser {
 	        				if ( positions == null ) {
             					positions = new ArrayList<Integer>();
             				}
-
             				d.setPosList(token, wordPos);
         				}
-        				//### debug print
-        				//System.out.println("Token : " + token + " Word Pos : " + wordPos + " DWordsCounter : " + d.getWordsCounter() + " keyword : " + word.getDocFreq());
-        				//System.out.println("Size : " + d.getPosList().size());
-      
-        			
- //PART2
- /******************************************************************************************************************
-  * give attention here please		
-  */
-        				//this iteration updates the docfreq-wordfreq
-        				//for our vocabulary and generally from the doclist
-        				//we 're going to create our posting file.
+
         				HashMap<String,Word> docWords = null;
         				for(String tdoc : docsMap.keySet())
         				{
@@ -140,45 +123,36 @@ public class Parser {
         						docWord.incrementDocFreq();
         						docWord.incrementWordFreq();	
         					}
-        			
-        					
-        				
         				}
-        				
-        				//ind contains the distinct Only Words from all document files. Treemap - String,Word
-        				//essentially, represents our VOCABULARY
         				if ( !vocabulary.containsKey(token)){
 
         					vocabulary.put(token, (int) word.getWordFreq().getTF());
         				}
-/**********************************************************************************************************************
- * i think we should change the code to be better and efficient.
- * i believe we should merge the code from parts 1-2
- * 
- * Part2 is related with all docs. 
- * Part1 is related with one doc.
- */
         			}
         			else {
         				System.out.print("Word: "+token+" is a stop word.");
         			}
-        			
         		}
         	}
         	bufReader.close();
         	wordPos = 0;
+        	docFile.write(Long.toString(d.getDocumentID()).getBytes(Charset.forName("UTF-8")));
+        	docFile.write((" " + d.getDocumentPath() ).getBytes(Charset.forName("UTF-8")));
+        	docFile.write((" " + d.getDocumentFormat()).getBytes(Charset.forName("UTF-8")));
+        	docFile.write(System.getProperty("line.separator").getBytes(Charset.forName("UTF-8")));
+        	prevPos = nextPos;
+			nextPos = (int) docFile.length();	
+        	d.setDocsLineSize(nextPos-prevPos);
+        	d.setDocsLinePos(prevPos);
         	
+        	System.out.println("PrevPos : " + prevPos + " NextPos : " +  (nextPos-prevPos));
         	docsMap.put(Long.toString(d.getDocumentID()), d);
         }
-        System.out.println("Vocabulary size"  + vocabulary.size());
+  
+        docFile.close();
 	}
 
 	private Word isWordOnMapOfWords(String token, HashMap<String, Word> hashMap) {
-		//if we change HashMap to HashMap<String>, we ll be able to use
-		//return words.containsKey(token); for checking if token exists already in map
-		//much faster?!
-
-		
 		return (hashMap.containsKey(token)) ? hashMap.get(token) : null; 
 	}
 

@@ -32,7 +32,6 @@ public class Indexer {
 
 	private static final String VOCABULARY = "CollectionIndex\\VocabularyFile.txt";
 	private static final String POSTING = "CollectionIndex\\PostingFile.txt";
-	private static final String DOCUMENT = "CollectionIndex\\DocumentsFile.txt";
 
 	private static HashMap<String,Document> documents;
 	private static TreeMap<String, Integer> vocabulary;
@@ -88,6 +87,8 @@ public class Indexer {
 					for (int i = 0; i < wordList.size(); i++) {
 						postingFile.write((" " + Integer.toString(wordList.get(i))).getBytes(Charset.forName("UTF-8")));
 					}
+					postingFile.write((" " + Integer.toString(doc.getDocsLinePos()) + " ").getBytes(Charset.forName("UTF-8")));
+					postingFile.write(Integer.toString(doc.getDocsLineSize()).getBytes(Charset.forName("UTF-8")));
 					postingFile.write(System.getProperty("line.separator").getBytes(Charset.forName("UTF-8")));
 				}	
 			}
@@ -128,39 +129,8 @@ public class Indexer {
 		}
 	}
 
-	private static void createFile(String outputFile) {
 
-		/* output file location is identified from the configuration file */
-		RandomAccessFile file = null;
-		try {
-			file = new RandomAccessFile( outputFile, "rw");
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
 
-	private static void writeToFile(String filePath, String str,
-			int position) {
-		RandomAccessFile file;
-		try {
-			file = new RandomAccessFile(filePath, "rw");
-			file.seek(position);
-			//file.write(str);
-			//file.writeChars("str");
-			file.write("aek".getBytes(Charset.forName("UTF-8")));
-			System.out.println(file.length());
-			file.close();
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		
-	}
 
 	private static String readFromFile(String filePath, int position, int size)
 			throws IOException {
@@ -172,17 +142,9 @@ public class Indexer {
 		System.out.println("File Length : " + file.length());
 		file.close();
 		return new String( bytes);
-
 	}
-	private static void closeFile(RandomAccessFile file) {
-		try {
-			file.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-
+	
+	
 	/* Builds the inverted index, reads all documents */
 	public static InvertedIndex buildInvertedIndex() throws IOException {
 		Document d;
@@ -198,7 +160,6 @@ public class Indexer {
 		 * now lets parse the input file we call the parser that returns a set
 		 * of Document objects
 		 */
-
 		Parser parser = new Parser(inputFiles);
 		parser.readDocuments();
 		documents = parser.getDocsList();
