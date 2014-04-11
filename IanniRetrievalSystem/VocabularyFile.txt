@@ -1,0 +1,8 @@
+apartements	1	0 34boats	1	35 46cars	1	82 20rent	1	103 30yachts	1	134 364 36
+	1	134 36
+ 1 	 82,20
+rent            	     1 	 103,30
+yachts          	     1 	 134,36
+
+
+s     	     1 	 59,58boats           	     1 	 179,119cars            	     1 	 238,58rent            	     1 	 326,87yachts          	     1 	 414,87
