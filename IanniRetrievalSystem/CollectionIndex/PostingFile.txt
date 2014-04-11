@@ -1,14 +1,14 @@
-5 apartements  2
-4 apartements  3
-3 boats  2
-2 boats  1
-1 boats  1 3
-5 boats  3
-1 cars  2
-5 cars  4
-3 rent  1
-5 rent  1
-4 rent  1
-2 yachts  2
-5 yachts  5
-4 yachts  2
+5 apartements  2 360 90
+4 apartements  3 270 90
+3 boats  2 180 90
+2 boats  1 90 90
+1 boats  1 3 0 90
+5 boats  3 360 90
+1 cars  2 0 90
+5 cars  4 360 90
+3 rent  1 180 90
+5 rent  1 360 90
+4 rent  1 270 90
+2 yachts  2 90 90
+5 yachts  5 360 90
+4 yachts  2 270 90
