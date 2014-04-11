@@ -34,7 +34,7 @@ public class QueryResults {
 			int posStart = term.getPosStart();
 			int bytesLength   = term.getBytesLength();
 			
-			System.out.println("/nResults for Query:"+text);
+			System.out.println("\nResults for Query:"+text);
 			System.out.println("PosStart: " + posStart + " | PosEnd: " + bytesLength);
 			
 			getDocsFromPostingFile(posStart,bytesLength);
