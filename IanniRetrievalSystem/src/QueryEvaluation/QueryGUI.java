@@ -32,7 +32,6 @@ public class QueryGUI {
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
-
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -43,8 +42,6 @@ public class QueryGUI {
 				}
 			}
 		});
-		
-
 	}
 
 	/**
@@ -171,8 +168,7 @@ public class QueryGUI {
 		);
 		frame.getContentPane().setLayout(groupLayout);
 	}
-	
-	
+		
 
 	protected void OKAPIButtonActionPerformed(ActionEvent evt) {
 		System.out.println("OKAPI Retrieval MOdel");
@@ -192,9 +188,10 @@ public class QueryGUI {
 
 	protected void SearchButtonActionPerformed(ActionEvent evt) throws IOException {
 		Vocabulary voc = new Vocabulary();
+		HashMap<String,VocabularyEntry> vocabulary = new HashMap<String,VocabularyEntry>();
+		ArrayList<String> results = new ArrayList<String>();
         RetrievalModel model = null;
-		HashMap<String,VocabularyEntry> vocabulary = null;
-                
+
         /* Start counting time */
         long start, stop;
         start = System.currentTimeMillis();
@@ -206,26 +203,28 @@ public class QueryGUI {
 
         /* According to the selected Retrieval model by user, instantiate it */
         model = chooseRetrievalModel(retrievalModel, vocabulary);
-        
-        /* Retrieve the scores according to this model */
-        ScoreEntry[] scoreEntry = model.evaluateQuery(queryField.getText());
-        
+
         /* Get the query results */
-        System.out.println(">Query: "+queryField.getText());
-        QueryResults res = new QueryResults( vocabulary, scoreEntry, queryField.getText());
-        ArrayList<String> results = res.getResults();
+        System.out.println(">Query: "+ queryField.getText());
+        QueryResults res = new QueryResults(vocabulary, model, queryField.getText());
+        results = res.createResults();
+
         textArea.setEnabled(true);
-        textArea.setText(results.toString());
+        
+        /* Print out Document Paths */
+        for (int i=0; i<res.getPaths().size(); i++) {
+        	textArea.append(res.getPaths().get(i)+"\n");
+        }
         
         /* Stop counting time */
         stop = System.currentTimeMillis();
-        
+
         /* Print Statistics */
-        printStatistics(stop - start, res);        
+        printStatistics(stop - start, res);
         System.out.println("QueryEvaluator ends!");
 	}
-	
-	
+
+
 	/* Get user selected Retrieval Model (0, 1, 2) and return the new instance of it */
 	public static RetrievalModel chooseRetrievalModel(int opt, HashMap<String,VocabularyEntry> voc) {
         switch (opt) {
@@ -239,10 +238,8 @@ public class QueryGUI {
                 return null;
         }
     }
-	
-	/* Print statistics of the program
-	 * time and size of results data
-	 */
+
+	/* Print statistics of the program time and size of results data */
 	private static void printStatistics(long l, Object res) {		// TO CHANGE: set res type!
 		System.out.println("Time passed:" + l + res.toString());	// res.LENGTH instead of toString!
 	}

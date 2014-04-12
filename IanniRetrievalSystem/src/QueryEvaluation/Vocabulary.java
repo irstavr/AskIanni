@@ -39,7 +39,7 @@ public class Vocabulary {
 				// just for testing!
 				System.out.println(line);
 
-				String[] lineStrings = line.split(" ",4);
+				String[] lineStrings = line.split("\\s+",4);
 
 				System.out.print("term: "+lineStrings[0]);
 				System.out.print(" df: "+lineStrings[1]);
