@@ -79,15 +79,12 @@ public class Indexer {
 		int prevPos = 0;
 		RandomAccessFile postingFile = new RandomAccessFile(POSTING, "rw");
 		RandomAccessFile vocabularyFile = new RandomAccessFile(VOCABULARY, "rw");
-<<<<<<< HEAD
+
 		
 		vocabularyFile.write((Integer.toString(documents.size())).getBytes(Charset.forName("UTF-8")));
 		vocabularyFile.write(System.getProperty("line.separator").getBytes(
 				Charset.forName("UTF-8")));
-=======
 
-
->>>>>>> d6712acc6e022e940f084df8cc6cb8f67fa88691
 		for (Entry<String, Word> vocEntry : vocabulary.entrySet()) {
 			String wordStr = vocEntry.getKey();
 			Word word = vocEntry.getValue();
@@ -155,13 +152,13 @@ public class Indexer {
 		}
 	}
 
-	private static String readFromFile(String filePath, int position, int size)	throws IOException {
+	private static void readFromFile(String filePath, int position, int size)	throws IOException {
 
 
 		RandomAccessFile file = new RandomAccessFile(VOCABULARY, "rw");
 		file.seek(0);
-		//String s = new String(file.read(),"UTF-8");
-		//System.out.println(file.readUTF());
+	//	String s = new String(file.read());
+		System.out.println(file.readUTF());
 
 		
 		file.close();
