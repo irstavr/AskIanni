@@ -34,28 +34,40 @@ public class Vocabulary {
 			RandomAccessFile file = new RandomAccessFile(vocabularyFileName, "r");
 			
 			for (String line; (line=file.readLine()) != null; ) {
-				
+
 				// TO-DO: comment out these lines!
 				// just for testing!
-				System.out.println(line);
-
-				String[] lineStrings = line.split("\\s+",4);
+				String[] lineStrings = line.split("\\s+");
 
 				System.out.print("term: "+lineStrings[0]);
-				System.out.print(" df: "+lineStrings[1]);
-				System.out.print(" pos1: "+lineStrings[2]);
-				System.out.println(" pos2: "+lineStrings[3]);
+				System.out.print(" | df: "+lineStrings[1]);
+				System.out.print(" | startPos: "+lineStrings[2]);
+				System.out.println(" | readBytes: "+lineStrings[3]);
 
 				// add from file to the vocabulary
 				addToVocabulary(lineStrings[0],Long.parseLong(lineStrings[1]),Integer.parseInt(lineStrings[2]),Integer.parseInt(lineStrings[3]));				
 			}		
 			file.close();
-			
 		} catch (IOException e) {
 			e.printStackTrace();
-		}
-		
+		}		
 	}
+	
+	@SuppressWarnings("resource")
+	public static int getNumOfDocuments() throws IOException {
+		RandomAccessFile file = new RandomAccessFile("VocabularyFile.txt", "r");
+		
+		file.seek(0);
+		String line = file.readLine();
+		
+		return Integer.parseInt(line);		
+	}
+
+	public double getAvgdl() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
 	
 	
 }

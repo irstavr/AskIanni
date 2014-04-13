@@ -72,8 +72,8 @@ public class Indexer {
 		RandomAccessFile vocabularyFile = new RandomAccessFile(VOCABULARY, "rw");
 		
 		//create files
-		createFile(POSTING);
-		createFile(VOCABULARY);
+		//createFile(POSTING);
+		//createFile(VOCABULARY);
 		
 		
 		for (String word : vocabulary.keySet()) {
