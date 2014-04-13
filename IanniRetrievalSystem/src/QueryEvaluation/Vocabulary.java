@@ -36,20 +36,22 @@ public class Vocabulary {
 			String firstLine = file.readLine();
 			numOfDocs = Integer.parseInt(firstLine);
 			System.out.println("N="+numOfDocs);
-			
+			//line=new String(file.readLine().getBytes("UTF-8"),"UTF-8")
 			for (String line; (line=file.readLine()) != null; ) {
-
+				
 				// TO-DO: comment out these lines!
 				// just for testing!
 				String[] lineStrings = line.split("\\s+");
-
-				System.out.print("term: "+lineStrings[0]);
+				
+			
+				String term = new String(lineStrings[0].getBytes("UTF-8"), "UTF-8");
+				System.out.print("term: "+term);
 				System.out.print(" | df: "+lineStrings[1]);
 				System.out.print(" | startPos: "+lineStrings[2]);
 				System.out.println(" | readBytes: "+lineStrings[3]);
 
 				// add from file to the vocabulary
-				addToVocabulary(lineStrings[0],Long.parseLong(lineStrings[1]),Integer.parseInt(lineStrings[2]),Integer.parseInt(lineStrings[3]));				
+				addToVocabulary(term,Long.parseLong(lineStrings[1]),Integer.parseInt(lineStrings[2]),Integer.parseInt(lineStrings[3]));				
 			}		
 			file.close();
 		} catch (IOException e) {
@@ -63,8 +65,8 @@ public class Vocabulary {
 	}
 
 	public double getAvgdl() {
-		// TODO Auto-generated method stub
-		return 0;
+		int sum = QueryResults.getSumDocLength();
+		return sum/numOfDocs;
 	}
 
 	

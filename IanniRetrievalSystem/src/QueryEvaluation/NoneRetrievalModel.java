@@ -18,7 +18,8 @@ public class NoneRetrievalModel implements RetrievalModel{
         
         Iterator<String> it = ((Set<String>) docs).iterator();
         while (it.hasNext()) {
-        	scores.put(it.next(), new ScoreEntry(1, it.next()));
+        	String id = it.next();
+        	scores.put(id, new ScoreEntry(1, id));
         }
         return scores;
 	}

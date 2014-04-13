@@ -21,6 +21,7 @@ public class QueryResults {
 	
 	private static HashMap<String,Float> termDFs;						/* key: term string, value: its df 					*/
 	private static HashMap<String,HashMap<String,Float>> termTFs;		/* key: term , value: map<docID,tf>					*/
+	private static int sumDocLength;
 
 	public QueryResults(QueryGUI gui, HashMap<String,VocabularyEntry> voc, RetrievalModel model, String query) throws IOException {
 		this.gui = gui;
@@ -107,11 +108,11 @@ public class QueryResults {
 					
 					/* get just one example of the positions */
 					file.seek(positions.get(0));
-					while(file.getFilePointer() < positions.get(0)+50) {
+					//while(file.getFilePointer() < positions.get(0)+50) {
 			            line = file.readLine();
-			            System.out.println("Snippet ("+docID+" "+ pos.get(i)+") = "+line);
-			            break;
-					}
+			            System.out.println("Snippet ("+docID+") = "+line);
+			          //  break;
+					//}
 				}
 			}
 		}
@@ -131,8 +132,12 @@ public class QueryResults {
             System.out.println(line);
             
 			String[] lineStrings = line.split("\\s+");
+			
+			
+			byte[] bytes = new byte[lineStrings[1].length()];
+			String term = new String(bytes, "UTF-8");
 			System.out.print("docID: "+lineStrings[0]);
-			System.out.print(" | term: "+lineStrings[1]);
+			System.out.print(" | term: "+term);
 			System.out.print(" | tfTerm: "+lineStrings[2]);
 			System.out.print(" | posStart: "+lineStrings[3]);
 			System.out.print(" | bytesToRead: "+lineStrings[4]);
@@ -155,14 +160,14 @@ public class QueryResults {
 			}
 			
 			/* store TF into the map */
-			if ( getTermTFs().containsKey(lineStrings[1]) ) {				
-				HashMap<String,Float> tfs = getTermTFs().get(lineStrings[1]);
+			if ( getTermTFs().containsKey(term) ) {				
+				HashMap<String,Float> tfs = getTermTFs().get(term);
 				tfs.put(lineStrings[0], Float.parseFloat(lineStrings[2]));
-				getTermTFs().put(lineStrings[1], tfs);			
+				getTermTFs().put(term, tfs);			
 			} else {
 				HashMap<String,Float> tfs = new HashMap<>();
 				tfs.put(lineStrings[0], Float.parseFloat(lineStrings[2]));
-				getTermTFs().put(lineStrings[1], tfs);
+				getTermTFs().put(term, tfs);
 			}			
 			
 			/* Get the infos from DocumentsFile */
@@ -186,7 +191,8 @@ public class QueryResults {
 			docsIDPathMap.put(lineStrings[0], lineStrings[1]);	/* add the docID with its path to the map */
 			
 			//String format = lineStrings[2];
-			//long docLength = lineStrings[3];
+			setSumDocLength(getSumDocLength() + Integer.parseInt(lineStrings[3]));
+			
 		}
 		file.close();
 	}
@@ -228,5 +234,13 @@ public class QueryResults {
 	 */
 	public static void setTermTFs(HashMap<String,HashMap<String,Float>> termTFs) {
 		QueryResults.termTFs = termTFs;
+	}
+
+	public static int getSumDocLength() {
+		return sumDocLength;
+	}
+
+	public void setSumDocLength(int sumDocLength) {
+		QueryResults.sumDocLength = sumDocLength;
 	}
 }

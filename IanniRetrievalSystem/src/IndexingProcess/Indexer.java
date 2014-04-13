@@ -134,7 +134,7 @@ public class Indexer {
 		}
 		
 		
-		vocabularyFile.write("γιαννης".getBytes(Charset.forName("UTF-8")));
+		//vocabularyFile.write("γιαννης".getBytes(Charset.forName("UTF-8")));
 	/*	vocabulary.clear();
 		documents.clear();
 		maxtfdoc.clear();*/
@@ -166,7 +166,6 @@ public class Indexer {
 		String s = new String(bytes, "UTF-8");
 		System.out.println(s);
 
-		
 		file.close();
 
 	
