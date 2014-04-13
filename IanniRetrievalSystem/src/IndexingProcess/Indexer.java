@@ -88,7 +88,7 @@ public class Indexer {
 		for (Entry<String, Word> vocEntry : vocabulary.entrySet()) {
 			String wordStr = vocEntry.getKey();
 			Word word = vocEntry.getValue();
-			System.out.printf("Word : %-15s \tDocument Frequency : %3d\n", wordStr , word.getDocFreq());
+		//	System.out.printf("Word : %-15s \tDocument Frequency : %3d\n", wordStr , word.getDocFreq());
 			for (Entry<Long, ArrayList<Integer>> entry : word.getDocPosMap()
 					.entrySet()) {
 				Long docId = entry.getKey();
@@ -132,13 +132,16 @@ public class Indexer {
 			vocabularyFile.write(System.getProperty("line.separator").getBytes(
 					Charset.forName("UTF-8")));
 		}
+		
+		
+		vocabularyFile.write("γιαννης".getBytes(Charset.forName("UTF-8")));
 	/*	vocabulary.clear();
 		documents.clear();
 		maxtfdoc.clear();*/
 		postingFile.close();
 		vocabularyFile.close();
 		
-		readFromFile("my.txt", 0, 10);
+		readFromFile("my.txt", 0, 100);
 	}
 
 	private static void createFolder() {
@@ -156,9 +159,12 @@ public class Indexer {
 
 
 		RandomAccessFile file = new RandomAccessFile(VOCABULARY, "rw");
-		file.seek(0);
-	//	String s = new String(file.read());
-		System.out.println(file.readUTF());
+		file.seek(position);
+		byte[] bytes = new byte[size];
+		file.read(bytes);
+
+		String s = new String(bytes, "UTF-8");
+		System.out.println(s);
 
 		
 		file.close();

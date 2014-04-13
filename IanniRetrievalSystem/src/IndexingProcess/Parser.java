@@ -44,6 +44,7 @@ public class Parser {
 	public void readDocuments() throws IOException {
 		// parsing file
 		docFile.seek(0);
+	
 		Stemmer.Initialize();
 		parse("documentCollection");
 		
@@ -109,7 +110,7 @@ public class Parser {
 						wordPos += token.length()+1;
 					
 						
-						System.out.println(token);
+						//System.out.println(token);
 						token = Stemmer.Stem(token);
 						
 						d.incrementWordsCounter();
