@@ -40,5 +40,6 @@ public class VocabularyEntry {
 	public void setBytesLength(int bytesLength) {
 		this.bytesLength = bytesLength;
 	}
+	
 
 }

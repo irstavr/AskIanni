@@ -5,7 +5,6 @@ import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import javax.swing.ButtonGroup;
@@ -32,7 +31,6 @@ public class QueryGUI {
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
-
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -43,8 +41,6 @@ public class QueryGUI {
 				}
 			}
 		});
-		
-
 	}
 
 	/**
@@ -116,11 +112,11 @@ public class QueryGUI {
 		JLabel lblChooseRetrievalModel = new JLabel("Choose retrieval model:");
 		lblChooseRetrievalModel.setForeground(Color.LIGHT_GRAY);
 		
-		textArea = new JTextArea();
-		textArea.setEnabled(false);
-		textArea.setEditable(false);
-		textArea.setForeground(Color.LIGHT_GRAY);
-		textArea.setBackground(Color.DARK_GRAY);
+		setTextArea(new JTextArea());
+		getTextArea().setEnabled(false);
+		getTextArea().setEditable(false);
+		getTextArea().setForeground(Color.LIGHT_GRAY);
+		getTextArea().setBackground(Color.DARK_GRAY);
 		GroupLayout groupLayout = new GroupLayout(frame.getContentPane());
 		groupLayout.setHorizontalGroup(
 			groupLayout.createParallelGroup(Alignment.TRAILING)
@@ -131,7 +127,7 @@ public class QueryGUI {
 							.addComponent(progressBar, GroupLayout.DEFAULT_SIZE, 853, Short.MAX_VALUE)
 							.addContainerGap())
 						.addGroup(groupLayout.createSequentialGroup()
-							.addComponent(textArea, GroupLayout.DEFAULT_SIZE, 853, Short.MAX_VALUE)
+							.addComponent(getTextArea(), GroupLayout.DEFAULT_SIZE, 853, Short.MAX_VALUE)
 							.addContainerGap())
 						.addGroup(groupLayout.createSequentialGroup()
 							.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
@@ -164,15 +160,14 @@ public class QueryGUI {
 							.addPreferredGap(ComponentPlacement.RELATED, 41, Short.MAX_VALUE)
 							.addComponent(SearchButton)
 							.addGap(124)))
-					.addComponent(textArea, GroupLayout.DEFAULT_SIZE, 74, Short.MAX_VALUE)
+					.addComponent(getTextArea(), GroupLayout.DEFAULT_SIZE, 74, Short.MAX_VALUE)
 					.addGap(18)
 					.addComponent(progressBar, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 					.addContainerGap())
 		);
 		frame.getContentPane().setLayout(groupLayout);
 	}
-	
-	
+		
 
 	protected void OKAPIButtonActionPerformed(ActionEvent evt) {
 		System.out.println("OKAPI Retrieval MOdel");
@@ -192,9 +187,9 @@ public class QueryGUI {
 
 	protected void SearchButtonActionPerformed(ActionEvent evt) throws IOException {
 		Vocabulary voc = new Vocabulary();
+		HashMap<String,VocabularyEntry> vocabulary = new HashMap<String,VocabularyEntry>();
         RetrievalModel model = null;
-		HashMap<String,VocabularyEntry> vocabulary = null;
-                
+
         /* Start counting time */
         long start, stop;
         start = System.currentTimeMillis();
@@ -206,44 +201,48 @@ public class QueryGUI {
 
         /* According to the selected Retrieval model by user, instantiate it */
         model = chooseRetrievalModel(retrievalModel, vocabulary);
-        
-        /* Retrieve the scores according to this model */
-        ScoreEntry[] scoreEntry = model.evaluateQuery(queryField.getText());
-        
+
         /* Get the query results */
-        System.out.println(">Query: "+queryField.getText());
-        QueryResults res = new QueryResults( vocabulary, scoreEntry, queryField.getText());
-        ArrayList<String> results = res.getResults();
-        textArea.setEnabled(true);
-        textArea.setText(results.toString());
-        
+        System.out.println(">Query: "+ queryField.getText());
+        QueryResults res = new QueryResults(this, vocabulary, model, queryField.getText());
+        res.createResults();
+
+        getTextArea().setEnabled(true);
+                
         /* Stop counting time */
         stop = System.currentTimeMillis();
-        
+
         /* Print Statistics */
-        printStatistics(stop - start, res);        
+        printStatistics(stop - start, res);
         System.out.println("QueryEvaluator ends!");
 	}
-	
-	
+
+
 	/* Get user selected Retrieval Model (0, 1, 2) and return the new instance of it */
-	public static RetrievalModel chooseRetrievalModel(int opt, HashMap<String,VocabularyEntry> voc) {
+	public static RetrievalModel chooseRetrievalModel(int opt, HashMap<String,VocabularyEntry> voc) throws IOException {
         switch (opt) {
             case 0:
-            	return new NoneRetrievalModel(voc);
+            	return new NoneRetrievalModel();
             case 1:
                 return new VectorSpaceModel(voc);
             case 2:
-                return new OKAPIBM25(voc);
+                return new OKAPIBM25();
             default:
                 return null;
         }
     }
-	
-	/* Print statistics of the program
-	 * time and size of results data
-	 */
-	private static void printStatistics(long l, Object res) {		// TO CHANGE: set res type!
-		System.out.println("Time passed:" + l + res.toString());	// res.LENGTH instead of toString!
+
+	/* Print statistics of the program time and size of results data */
+	private static void printStatistics(long total_time, Object total_results) {		// TO CHANGE: set res type to long
+		System.out.println("Time: " + ((double)total_time/100)/1000 );
+	}
+
+	/* used on QueryResults in order to print straightly the results on the GUI */
+	public JTextArea getTextArea() {
+		return textArea;
+	}
+
+	public void setTextArea(JTextArea textArea) {
+		this.textArea = textArea;
 	}
 }
