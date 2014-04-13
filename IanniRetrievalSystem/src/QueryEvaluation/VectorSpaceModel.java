@@ -1,17 +1,16 @@
 package QueryEvaluation;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 
 public class VectorSpaceModel implements RetrievalModel{
 	private HashMap<String,VocabularyEntry> voc;
-	private LinkedList<String> docsIDs;
+	private Set<String> docsIDs;
 	private int numDocs;
 	
 	public VectorSpaceModel(HashMap<String,VocabularyEntry> voc) throws IOException {
@@ -19,7 +18,8 @@ public class VectorSpaceModel implements RetrievalModel{
 		this.numDocs = Vocabulary.getNumOfDocuments();
 	}
 
-	public ScoreEntry[] evaluateQuery(String query) {
+	public HashMap<String,ScoreEntry> evaluateQuery(String query) {
+		HashMap<String,ScoreEntry> results = new HashMap<String,ScoreEntry>();
 		float[] q = vectorizeQuery(query);
         float qNorm = calcNorm(q);
 
@@ -43,8 +43,10 @@ public class VectorSpaceModel implements RetrievalModel{
 //                scores.add(new ScoreEntry(score, ID));
 //            }
         }
-        ScoreEntry[] results = (ScoreEntry[]) scores.toArray(new ScoreEntry[scores.size()]);
+        
+       // ScoreEntry[] results = (ScoreEntry[]) scores.toArray(new ScoreEntry[scores.size()]);
        // Arrays.sort(results, new ScoreComparator());
+        
         return results;
 	}
 
@@ -104,8 +106,9 @@ public class VectorSpaceModel implements RetrievalModel{
     }
 
 	@Override
-	public void setDocsList(LinkedList<String> docsList) {
+	public void setDocsList(Set<String> docsList) {
 		this.docsIDs = docsList;
+		
 	}
 
 }

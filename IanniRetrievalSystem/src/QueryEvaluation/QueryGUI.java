@@ -234,7 +234,7 @@ public class QueryGUI {
 
 	/* Print statistics of the program time and size of results data */
 	private static void printStatistics(long total_time, Object total_results) {		// TO CHANGE: set res type to long
-		System.out.println("Time: " + ((double)total_time/100)/1000 + " | Res: "+(double)total_results/100);
+		System.out.println("Time: " + ((double)total_time/100)/1000 );
 	}
 
 	/* used on QueryResults in order to print straightly the results on the GUI */

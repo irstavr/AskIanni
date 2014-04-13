@@ -1,25 +1,26 @@
 package QueryEvaluation;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 
 public class OKAPIBM25 implements RetrievalModel {
 	Vocabulary Voc;
-	private LinkedList<String> docsIDsList;
-	
+	private Set<String> docsIDsList;
+
     public OKAPIBM25() {
 		this.Voc = new Vocabulary();
 	}
-    
-    public ScoreEntry[] evaluateQuery(String query) throws IOException {
+
+    public HashMap<String,ScoreEntry> evaluateQuery(String query) throws IOException {
     	//Get num of docs
     	int numDocs = Vocabulary.getNumOfDocuments();
 
     	//List with scores for every doc
-    	LinkedList<ScoreEntry> scores = new LinkedList<>();
+    	HashMap<String,ScoreEntry> docScores = new HashMap<String, ScoreEntry>();
     
     	//Tokenize the query
     	String[] tokens = tokenizeQuery(query);
@@ -34,15 +35,15 @@ public class OKAPIBM25 implements RetrievalModel {
             String docID = it.next();
             score = scoreOKAPIBM25(tokens, numDocs, docID, avgdl, 2.0, 0.75);
             if (score > 0) {
-                scores.add(new ScoreEntry((new Double(score)).floatValue(), docID));
+            	docScores.put(docID, (new ScoreEntry((new Double(score)).floatValue(), docID)) );
             }
         }
-        ScoreEntry[] results = (ScoreEntry[]) scores.toArray(new ScoreEntry[scores.size()]);        
+        //ScoreEntry[] results = (ScoreEntry[]) scores.toArray(new ScoreEntry[scores.size()]);        
   
-        return results;
+        return docScores;
     }
 
-    
+
     private double scoreOKAPIBM25(String[] tokens,int numDocs, String docID, double avgdl, double k, double b) throws IOException {
 		double sum = 0;
         for (int i = 0; i < tokens.length; i++) {
@@ -71,7 +72,7 @@ public class OKAPIBM25 implements RetrievalModel {
     }
 
 	@Override
-	public void setDocsList(LinkedList<String> docsList) {
+	public void setDocsList(Set<String> docsList) {
 		this.docsIDsList = docsList;
 	}
 }

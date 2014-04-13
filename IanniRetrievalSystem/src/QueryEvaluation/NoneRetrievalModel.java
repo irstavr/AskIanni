@@ -1,31 +1,30 @@
 package QueryEvaluation;
 
+import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.Set;
 
 public class NoneRetrievalModel implements RetrievalModel{
 
-	private LinkedList<String> docs;
+	private Set<String> docs;
 
 	public NoneRetrievalModel() {
-		this.docs = new LinkedList<String>();
 	}
 
-	public ScoreEntry[] evaluateQuery(String query) {
+	public HashMap<String,ScoreEntry> evaluateQuery(String query) {
 		
 		//create new score entries for this list of documents
-		ScoreEntry[] results = new ScoreEntry[docs.size()];
+		HashMap<String, ScoreEntry> scores = new HashMap<String, ScoreEntry>();
         
-        Iterator<String> it = ((LinkedList<String>) docs).iterator();
-        int i = 0;
+        Iterator<String> it = ((Set<String>) docs).iterator();
         while (it.hasNext()) {
-        	results[i] = new ScoreEntry(1, it.next());
-        	i++;
+        	scores.put(it.next(), new ScoreEntry(1, it.next()));
         }
-        return results;
+        return scores;
 	}
 	
-	public void setDocsList(LinkedList<String> docsList) {
+	@Override
+	public void setDocsList(Set<String> docsList) {
 		System.out.println("setDocsList sto NoneRetrieavalModel");
 		this.docs = docsList;
 	}
