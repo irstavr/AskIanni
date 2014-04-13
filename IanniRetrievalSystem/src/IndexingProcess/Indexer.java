@@ -80,6 +80,7 @@ public class Indexer {
 		RandomAccessFile postingFile = new RandomAccessFile(POSTING, "rw");
 		RandomAccessFile vocabularyFile = new RandomAccessFile(VOCABULARY, "rw");
 
+
 		for (Entry<String, Word> vocEntry : vocabulary.entrySet()) {
 			String wordStr = vocEntry.getKey();
 			Word word = vocEntry.getValue();
@@ -114,8 +115,9 @@ public class Indexer {
 
 			prevPos = nextPos;
 			nextPos = (int) postingFile.length();
-			
+	
 			vocabularyFile.write((wordStr + " ").getBytes(Charset.forName("UTF-8")));
+
 			vocabularyFile.write(Integer.toString(word.getDocFreq()).getBytes(
 					Charset.forName("UTF-8")));
 			vocabularyFile.write((" " + Integer.toString(prevPos))
@@ -146,8 +148,8 @@ public class Indexer {
 		}
 	}
 
-	private static void readFromFile(String filePath, int position, int size)
-			throws IOException {
+	private static String readFromFile(String filePath, int position, int size)	throws IOException {
+
 
 		RandomAccessFile file = new RandomAccessFile(VOCABULARY, "rw");
 		file.seek(0);
