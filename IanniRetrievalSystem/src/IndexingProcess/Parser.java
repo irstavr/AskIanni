@@ -79,10 +79,9 @@ public class Parser {
 		int prevPos, nextPos = 0;
 		int maxFreq = 0, tpos = 0;
 		int wordPos = 0, position = 0;
-
-		
 	
 		inputFiles = dir.listFiles();
+	int i =0;
 		for (File f : inputFiles) {
 			if (f.isFile()) {
 				maxFreq = 0;
@@ -100,20 +99,19 @@ public class Parser {
 				RandomAccessFile rafFile =new RandomAccessFile(f.getAbsolutePath(),"rw"); 
 				                     
 			
-				                               
-				while(rafFile.getFilePointer()<rafFile.length()){
-				//while ((line = bufReader.readLine()) != null) {
+				while ((line = bufReader.readLine()) != null) {
 					wordPos = 0;
 					tpos = 0;
-					tokenizer = new StringTokenizer(rafFile.readLine(), delimiter);
-					
-					
-					
+					tokenizer = new StringTokenizer(line, delimiter);
+			
 					while (tokenizer.hasMoreTokens()) {
 						token = tokenizer.nextToken().toLowerCase();
+					
+						tpos = token.length() ;
+						wordPos += token.length()+1;
+						p++;
 						
-						tpos = token.length();
-						wordPos += token.length();
+					
 						
 						System.out.println(token);
 						token = Stemmer.Stem(token);
@@ -129,7 +127,7 @@ public class Parser {
 								word = vocabulary.get(token);
 								word.addWordFreqMap(d.getDocumentID());
 							}
-							word.addToPosList(d.getDocumentID(), (wordPos - tpos));
+							word.addToPosList(d.getDocumentID(), (wordPos - tpos-1));
 													}
 
 						// System
