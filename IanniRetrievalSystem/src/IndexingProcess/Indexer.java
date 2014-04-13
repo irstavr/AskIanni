@@ -83,7 +83,7 @@ public class Indexer {
 		for (Entry<String, Word> vocEntry : vocabulary.entrySet()) {
 			String wordStr = vocEntry.getKey();
 			Word word = vocEntry.getValue();
-
+			System.out.printf("Word : %-15s \tDocument Frequency : %3d\n", wordStr , word.getDocFreq());
 			for (Entry<Long, ArrayList<Integer>> entry : word.getDocPosMap()
 					.entrySet()) {
 				Long docId = entry.getKey();
@@ -114,17 +114,15 @@ public class Indexer {
 
 			prevPos = nextPos;
 			nextPos = (int) postingFile.length();
-
-
-
-			vocabularyFile.write((wordStr + " ").getBytes(Charset
-					.forName("UTF-8")));
+			
+			vocabularyFile.write((wordStr + " ").getBytes(Charset.forName("UTF-8")));
 			vocabularyFile.write(Integer.toString(word.getDocFreq()).getBytes(
 					Charset.forName("UTF-8")));
 			vocabularyFile.write((" " + Integer.toString(prevPos))
 					.getBytes(Charset.forName("UTF-8")));
 			vocabularyFile.write((" " + Integer.toString(nextPos - prevPos))
 					.getBytes(Charset.forName("UTF-8")));
+			//vocabularyFile.write("\n".getBytes("UTF-8"));
 			vocabularyFile.write(System.getProperty("line.separator").getBytes(
 					Charset.forName("UTF-8")));
 		}
@@ -133,6 +131,8 @@ public class Indexer {
 		maxtfdoc.clear();*/
 		postingFile.close();
 		vocabularyFile.close();
+		
+		readFromFile("my.txt", 0, 10);
 	}
 
 	private static void createFolder() {
@@ -146,18 +146,18 @@ public class Indexer {
 		}
 	}
 
-	private static String readFromFile(String filePath, int position, int size)
+	private static void readFromFile(String filePath, int position, int size)
 			throws IOException {
 
-		RandomAccessFile file = new RandomAccessFile(filePath, "r");
-		file.seek(position);
-		byte[] bytes = new byte[size];
-		file.read(bytes);
+		RandomAccessFile file = new RandomAccessFile(VOCABULARY, "rw");
+		file.seek(0);
+		
+		//System.out.println(file.readUTF());
 
-		System.out.println("File Length : " + file.length());
+		
 		file.close();
 
-		return new String(bytes);
+	
 	}
 
 

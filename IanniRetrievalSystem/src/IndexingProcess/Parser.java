@@ -95,22 +95,33 @@ public class Parser {
 				// Create new Document for this file and add it to the list
 				Document d = new Document(f.getName(), f.getAbsolutePath());
 				// Start looping through the file
-				while ((line = bufReader.readLine()) != null) {
+				
+				///////////////////////////////////////
+				RandomAccessFile rafFile =new RandomAccessFile(f.getAbsolutePath(),"rw"); 
+				                     
+			
+				                               
+				while(rafFile.getFilePointer()<rafFile.length()){
+				//while ((line = bufReader.readLine()) != null) {
 					wordPos = 0;
 					tpos = 0;
-					tokenizer = new StringTokenizer(line, delimiter);
-
+					tokenizer = new StringTokenizer(rafFile.readLine(), delimiter);
+					
+					
+					
 					while (tokenizer.hasMoreTokens()) {
 						token = tokenizer.nextToken().toLowerCase();
-
+						
 						tpos = token.length();
 						wordPos += token.length();
-
+						
+						System.out.println(token);
+						token = Stemmer.Stem(token);
+						
 						d.incrementWordsCounter();
 
 						if (!isStopWord(token)) {
-
-							word = new Word(Stemmer.Stem(token));
+							word = new Word(token);
 							if (!vocabulary.containsKey(token)) {
 								word.addWordFreqMap(d.getDocumentID());
 
@@ -119,8 +130,7 @@ public class Parser {
 								word.addWordFreqMap(d.getDocumentID());
 							}
 							word.addToPosList(d.getDocumentID(), (wordPos - tpos));
-							word.incrementDocFreq();
-						}
+													}
 
 						// System
 						if (word != null) {
