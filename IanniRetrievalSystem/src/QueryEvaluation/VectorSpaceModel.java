@@ -23,7 +23,6 @@ public class VectorSpaceModel implements RetrievalModel{
 		float[] q = vectorizeQuery(query);
         float qNorm = calcNorm(q);
 
-       // int numDocs = Vocabulary.getNumOfDocuments();
         ArrayList<Float> scores = new ArrayList<Float>(numDocs);
         float score;
 

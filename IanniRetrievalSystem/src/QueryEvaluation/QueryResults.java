@@ -17,7 +17,7 @@ public class QueryResults {
 	private HashMap<String,String> docsIDPathMap;						/* key: docID, value: path */
 	
 	private HashMap<String,ArrayList<Long>> wordPos;					/* key: docID, value: positions of this word in it 	*/
-	private HashMap<String, HashMap<String, ArrayList<Long>>> pos;	/* key: word, value: map<DocID,list<pos>> */
+	private HashMap<String, HashMap<String, ArrayList<Long>>> pos;		/* key: word, value: map<DocID,list<pos>> */
 	
 	private static HashMap<String,Float> termDFs;						/* key: term string, value: its df 					*/
 	private static HashMap<String,HashMap<String,Float>> termTFs;		/* key: term , value: map<docID,tf>					*/
@@ -82,7 +82,7 @@ public class QueryResults {
 
 			gui.getTextArea().append("Doc:"+ entry.getKey());
 			gui.getTextArea().append(" | Path"+ entry.getValue());
-			gui.getTextArea().append(" | Score"+ scores.get(entry.getKey()));
+			gui.getTextArea().append(" | Score"+ scores.get(entry.getKey()).getScore() );
 			gui.getTextArea().append(" | " + getSnippet(entry.getValue(),entry.getKey())+"\n");
 		}
 		return this.results;
@@ -95,8 +95,7 @@ public class QueryResults {
 		
 		String[] terms = query.split("\\s+");
 		
-		for ( int i =0; i<terms.length; i++ ) {
-			
+		for ( int i =0; i<terms.length; i++ ) {			
 			String word = terms[i];
 			
 			if ( pos.containsKey(word)) {
@@ -107,10 +106,11 @@ public class QueryResults {
 					ArrayList<Long> positions = docPos.get(docID);
 					
 					/* get just one example of the positions */
-					file.seek(positions.get(1));
-					while(file.getFilePointer() < positions.get(i)+50) {
+					file.seek(positions.get(0));
+					while(file.getFilePointer() < positions.get(0)+50) {
 			            line = file.readLine();
 			            System.out.println("Snippet ("+docID+" "+ pos.get(i)+") = "+line);
+			            break;
 					}
 				}
 			}

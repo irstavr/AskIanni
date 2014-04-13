@@ -10,7 +10,7 @@ import java.util.HashMap;
  *
  */
 public class Vocabulary {	
-
+	private static int numOfDocs;
 	private HashMap<String,VocabularyEntry> vocabulary = new HashMap<>();
 
 	/* Gets the vocabulary */
@@ -33,6 +33,10 @@ public class Vocabulary {
 		try {
 			RandomAccessFile file = new RandomAccessFile(vocabularyFileName, "r");
 			
+			String firstLine = file.readLine();
+			numOfDocs = Integer.parseInt(firstLine);
+			System.out.println("N="+numOfDocs);
+			
 			for (String line; (line=file.readLine()) != null; ) {
 
 				// TO-DO: comment out these lines!
@@ -53,14 +57,9 @@ public class Vocabulary {
 		}		
 	}
 	
-	@SuppressWarnings("resource")
+	/* returns the num of documents that's on the 1st line of VocabularyFIle.txt */
 	public static int getNumOfDocuments() throws IOException {
-		RandomAccessFile file = new RandomAccessFile("VocabularyFile.txt", "r");
-		
-		file.seek(0);
-		String line = file.readLine();
-		
-		return Integer.parseInt(line);		
+		return numOfDocs;	
 	}
 
 	public double getAvgdl() {
