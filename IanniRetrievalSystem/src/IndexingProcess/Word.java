@@ -30,7 +30,7 @@ public class Word {
 
 	/* returns docFreq of this word */
 	public Integer getDocFreq() {
-		return this.docFreq;
+		return this.docPosMap.size();
 	}
 
 	/* increments docFreq of this word */

@@ -79,10 +79,9 @@ public class Parser {
 		int prevPos, nextPos = 0;
 		int maxFreq = 0, tpos = 0;
 		int wordPos = 0, position = 0;
-
-		
 	
 		inputFiles = dir.listFiles();
+	int i =0;
 		for (File f : inputFiles) {
 			if (f.isFile()) {
 				maxFreq = 0;
@@ -95,22 +94,32 @@ public class Parser {
 				// Create new Document for this file and add it to the list
 				Document d = new Document(f.getName(), f.getAbsolutePath());
 				// Start looping through the file
+				
+				///////////////////////////////////////
+				RandomAccessFile rafFile =new RandomAccessFile(f.getAbsolutePath(),"rw"); 
+				                     
+			
 				while ((line = bufReader.readLine()) != null) {
 					wordPos = 0;
 					tpos = 0;
 					tokenizer = new StringTokenizer(line, delimiter);
-
+			
 					while (tokenizer.hasMoreTokens()) {
 						token = tokenizer.nextToken().toLowerCase();
-
-						tpos = token.length();
-						wordPos += token.length();
-
+					
+						tpos = token.length() ;
+						wordPos += token.length()+1;
+						p++;
+						
+					
+						
+						System.out.println(token);
+						token = Stemmer.Stem(token);
+						
 						d.incrementWordsCounter();
 
 						if (!isStopWord(token)) {
-
-							word = new Word(Stemmer.Stem(token));
+							word = new Word(token);
 							if (!vocabulary.containsKey(token)) {
 								word.addWordFreqMap(d.getDocumentID());
 
@@ -118,9 +127,8 @@ public class Parser {
 								word = vocabulary.get(token);
 								word.addWordFreqMap(d.getDocumentID());
 							}
-							word.addToPosList(d.getDocumentID(), (wordPos - tpos));
-							word.incrementDocFreq();
-						}
+							word.addToPosList(d.getDocumentID(), (wordPos - tpos-1));
+													}
 
 						// System
 						if (word != null) {
