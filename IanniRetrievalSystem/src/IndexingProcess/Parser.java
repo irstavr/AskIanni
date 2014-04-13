@@ -43,12 +43,10 @@ public class Parser {
 	/* read and parse, analyze, stem the documents */
 	public void readDocuments() throws IOException {
 		// parsing file
-		docFile.seek(4);
+		docFile.seek(0);
 		Stemmer.Initialize();
 		parse("documentCollection");
-		docFile.seek(0);
-		docFile.write((docsMap.size() + System.getProperty("line.separator"))
-				.getBytes(Charset.forName("UTF-8")));
+		
 		docFile.close();
 		// stop words analyzer
 		stopWordsAnalyzer();
@@ -109,8 +107,6 @@ public class Parser {
 					
 						tpos = token.length() ;
 						wordPos += token.length()+1;
-						p++;
-						
 					
 						
 						System.out.println(token);
@@ -244,4 +240,6 @@ public class Parser {
 		this.maxtfdoc = maxtfdoc;
 	}
 
+	
+	
 }
