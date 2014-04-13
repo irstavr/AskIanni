@@ -11,10 +11,8 @@ public class Document {
 	private String documentName;
 	private String documentPath;
 	private String documentFormat;
-	private HashMap<String, Word> words;
 	private int wordsCounter;
 	private double norma;
-	private HashMap<String, ArrayList<Integer>> posList;
 	private int docsLineSize;
 	private int docsLinePos;
 
@@ -27,22 +25,13 @@ public class Document {
 		int pos = name.lastIndexOf('.');
 		this.documentFormat = name.substring(pos + 1);
 
-		this.words = new HashMap<String, Word>();
-		this.posList = new HashMap<String, ArrayList<Integer>>();
 		this.wordsCounter = 0;
 		this.norma = 0;
 		
-		StringBuilder s = new StringBuilder()
-		.append(Long.toString(this.documentID)).append("\t")
-		.append(this.documentPath).append("\t").append("\t")
-		.append(this.getDocumentFormat()).append("\n");
 		
-		docsLineSize = s.length();
+	
 	}
 
-	public void addWord(String word, Word freq) {
-		this.words.put(word, freq);
-	}
 
 	public String getDocumentFormat() {
 		return this.documentFormat;
@@ -68,13 +57,6 @@ public class Document {
 		return norma;
 	}
 
-	public HashMap<String, ArrayList<Integer>> getPosList() {
-		return posList;
-	}
-
-	public HashMap<String, Word> getWords() {
-		return this.words;
-	}
 
 	public int getWordsCounter() {
 		return this.wordsCounter;
@@ -104,27 +86,6 @@ public class Document {
 		this.norma = norma;
 	}
 
-	public void setPosList(String word, int pos) {
-
-		// System.out.println("Word : " + word + " Pos: " + pos);
-		if (posList.containsKey(word)) {
-			ArrayList<Integer> listPos = posList.get(word);
-			listPos.add(pos);
-			posList.put(word, listPos);
-		} else {
-			/* otherwise, add the word and then create new posting list */
-			ArrayList<Integer> listPos = new ArrayList<Integer>();
-			listPos.add(pos);
-			posList.put(word, listPos);
-		}
-
-		for (String s : posList.keySet()) {
-			for (int i = 0; i < posList.get(s).size(); i++)
-				;
-			// System.out.println("Word : " + s + posList.get(s).get(i));
-
-		}
-	}
 
 	public int getDocBytes() {
 		return 1;
@@ -147,4 +108,5 @@ public class Document {
 	public void setDocsLineSize(int docsLineSize) {
 		this.docsLineSize = docsLineSize;
 	}
+
 }
