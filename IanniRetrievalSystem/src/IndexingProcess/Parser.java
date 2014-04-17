@@ -30,6 +30,7 @@ public class Parser {
 	private final static Charset ENCODING = StandardCharsets.UTF_8;
 	private HashMap<Long, Short> maxtfdoc;
 	RandomAccessFile docFile;
+
 	/* accepts as a parameter the file to parse and the stop words to use */
 	public Parser() throws IOException {
 		this.docsMap = new HashMap<Long, Document>();
@@ -37,17 +38,17 @@ public class Parser {
 		this.stopWords = readStopWordFiles();
 		this.setVocabulary(new TreeMap<String, Word>());
 		this.maxtfdoc = new HashMap<Long, Short>();
-		 docFile = new RandomAccessFile(DOCUMENT, "rw");
+		docFile = new RandomAccessFile(DOCUMENT, "rw");
 	}
 
 	/* read and parse, analyze, stem the documents */
 	public void readDocuments() throws IOException {
 		// parsing file
 		docFile.seek(0);
-	
+
 		Stemmer.Initialize();
 		parse("documentCollection");
-		
+
 		docFile.close();
 		// stop words analyzer
 		stopWordsAnalyzer();
@@ -66,55 +67,50 @@ public class Parser {
 		// parse file and erase stop words
 	}
 
-
-
-
 	/* parsing files and erase every whitespace,number,sign */
 	private void parse(String directory) throws IOException {
 		File dir = new File(directory);
-		
-		String delimiter = "\t\n\r\f!@#$%^&*;:'\".,0123456789()_-[]{}<>?|~`+-=/ \'\b«»§΄―—’‘–°· \\";
+
+		String delimiter = "\t\n\r\f\b!@#$%^&*;:'\\\".,0123456789()_-[]{}<>?|~`+-=/ \\'«»§΄―—’‘–°·";
 		Word word = null;
 		int prevPos, nextPos = 0;
-		int maxFreq = 0, tpos = 0;
-		int wordPos = 0, position = 0;
-	
+		int maxFreq = 0;
+		int i =0,wordPos=0;
+		
 		inputFiles = dir.listFiles();
-	int i =0;
+
 		for (File f : inputFiles) {
 			if (f.isFile()) {
 				maxFreq = 0;
 				InputStreamReader fileReader = new InputStreamReader(
-						new FileInputStream(f), ENCODING.name());
+						new FileInputStream(f),  "UTF8");
 				BufferedReader bufReader = new BufferedReader(fileReader);
 				StringTokenizer tokenizer = null;
 				String token = null, line = null;
 
 				// Create new Document for this file and add it to the list
 				Document d = new Document(f.getName(), f.getAbsolutePath());
-				// Start looping through the file
+			
+				RandomAccessFile rafFile = new RandomAccessFile(
+						f.getAbsolutePath(), "rw");
 				
-				///////////////////////////////////////
-				RandomAccessFile rafFile =new RandomAccessFile(f.getAbsolutePath(),"rw"); 
-				                     
-			
+				
 				while ((line = bufReader.readLine()) != null) {
-					wordPos = 0;
-					tpos = 0;
+					i =0;
+					
 					tokenizer = new StringTokenizer(line, delimiter);
-			
+
 					while (tokenizer.hasMoreTokens()) {
 						token = tokenizer.nextToken().toLowerCase();
 					
-						tpos = token.length() ;
-						wordPos += token.length()+1;
-					
-						
-						//System.out.println(token);
-						token = Stemmer.Stem(token);
-						
 						d.incrementWordsCounter();
-
+						int tempos = wordPos;
+						
+						for( ;(i<line.length()) && (delimiter.indexOf(line.charAt(i))>-1); i++,wordPos++);
+						wordPos += token.length();
+						i+= token.length();
+						
+						token = Stemmer.Stem(token);
 						if (!isStopWord(token)) {
 							word = new Word(token);
 							if (!vocabulary.containsKey(token)) {
@@ -124,21 +120,22 @@ public class Parser {
 								word = vocabulary.get(token);
 								word.addWordFreqMap(d.getDocumentID());
 							}
-							word.addToPosList(d.getDocumentID(), (wordPos - tpos-1));
-													}
-
-						// System
+							word.addToPosList(d.getDocumentID(), tempos);
+						}
+						wordPos++;
+						
 						if (word != null) {
-							if (word.getMaxTFDoc().containsKey(d.getDocumentID())) {
+							if (word.getMaxTFDoc().containsKey(
+									d.getDocumentID())) {
 								if (maxFreq < word.getMaxTF(d.getDocumentID())) {
 									maxFreq = word.getMaxTF(d.getDocumentID());
-									maxtfdoc.put(d.getDocumentID(), (short) maxFreq);
+									maxtfdoc.put(d.getDocumentID(),
+											(short) maxFreq);
 								}
 							}
 							vocabulary.put(word.getWord(), word);
 						}
 					}
-
 				}
 				bufReader.close();
 				docFile.write(Long.toString(d.getDocumentID()).getBytes(
@@ -158,13 +155,11 @@ public class Parser {
 				d.setDocsLinePos(prevPos);
 
 				docsMap.put(d.getDocumentID(), d);
-			}
-			else
-			{
+			} else {
 				parse(f.getAbsolutePath());
 			}
 		}
-		
+
 	}
 
 	/* Returns a list of all the stop words from both GR+EN files */
@@ -241,6 +236,4 @@ public class Parser {
 		this.maxtfdoc = maxtfdoc;
 	}
 
-	
-	
 }

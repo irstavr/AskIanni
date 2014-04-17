@@ -134,14 +134,14 @@ public class Indexer {
 		}
 		
 		
-		//vocabularyFile.write("γιαννης".getBytes(Charset.forName("UTF-8")));
+		//vocabularyFile.write("Ξ“Ξ™Ξ‘ΞΞΞ—Ξ£".getBytes(Charset.forName("UTF-8")));
 	/*	vocabulary.clear();
 		documents.clear();
 		maxtfdoc.clear();*/
 		postingFile.close();
 		vocabularyFile.close();
 		
-		readFromFile("my.txt", 0, 100);
+		readFromFile("my.txt", 45, 20);
 	}
 
 	private static void createFolder() {
@@ -158,7 +158,7 @@ public class Indexer {
 	private static void readFromFile(String filePath, int position, int size)	throws IOException {
 
 
-		RandomAccessFile file = new RandomAccessFile(VOCABULARY, "rw");
+		RandomAccessFile file = new RandomAccessFile("documentCollection/Ulysses.txt", "rw");
 		file.seek(position);
 		byte[] bytes = new byte[size];
 		file.read(bytes);
