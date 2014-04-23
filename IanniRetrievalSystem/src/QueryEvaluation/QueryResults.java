@@ -64,7 +64,7 @@ public class QueryResults {
 		
 		String[] terms = tokenizeQuery(query);
 		
-		// tokenized query terms
+		//Tokenized query terms
 		for ( int i=0; i<terms.length; i++ ) {			
 			
 			

@@ -62,7 +62,8 @@ public class OKAPIBM25 implements RetrievalModel {
      * Tokenize the query into tokens
      * TOADD: stop words, stemming!
      */
-    private String[] tokenizeQuery(String query) {
+    @SuppressWarnings("unused")
+	private String[] tokenizeQuery(String query) {
         StringTokenizer tokenized = new StringTokenizer(query.toLowerCase());
         int numTokens = tokenized.countTokens();
         String[] tokens = new String[numTokens];

@@ -1,9 +1,5 @@
 package IndexingProcess;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-
 public class Document {
 	private static long nextID = 1;
 
@@ -27,9 +23,6 @@ public class Document {
 
 		this.wordsCounter = 0;
 		this.norma = 0;
-		
-		
-	
 	}
 
 
@@ -86,7 +79,6 @@ public class Document {
 		this.norma = norma;
 	}
 
-
 	public int getDocBytes() {
 		return 1;
 	}
@@ -100,13 +92,10 @@ public class Document {
 	}
 
 	public int getDocsLineSize() {
-		
-		
 		return docsLineSize;
 	}
 
 	public void setDocsLineSize(int docsLineSize) {
 		this.docsLineSize = docsLineSize;
 	}
-
 }

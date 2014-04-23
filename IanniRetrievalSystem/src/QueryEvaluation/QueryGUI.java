@@ -33,11 +33,11 @@ public class QueryGUI {
 	/**
 	 * Launch the application.
 	 */
-	public static void main(String[] args) {
+	public static void main(final HashMap<String,VocabularyEntry> vocabulary) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					QueryGUI window = new QueryGUI();
+					QueryGUI window = new QueryGUI(vocabulary);
 					window.frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -49,14 +49,14 @@ public class QueryGUI {
 	/**
 	 * Create the application.
 	 */
-	public QueryGUI() {
-		initialize();
+	public QueryGUI(HashMap<String,VocabularyEntry> vocabulary) {
+		initialize(vocabulary);
 	}
 
 	/**
 	 * Initialize the contents of the frame.
 	 */
-	private void initialize() {
+	private void initialize(final HashMap<String,VocabularyEntry> vocabulary) {
 		qMap = new HashMap<String, MutableInt>();
 		frame = new JFrame();
 		frame.getContentPane().setBackground(Color.DARK_GRAY);
@@ -72,7 +72,7 @@ public class QueryGUI {
 		SearchButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent evt) {
 				try {
-					SearchButtonActionPerformed(evt);
+					SearchButtonActionPerformed(evt,vocabulary);
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -189,9 +189,9 @@ public class QueryGUI {
 		retrievalModel = 0;
 	}
 
-	protected void SearchButtonActionPerformed(ActionEvent evt) throws IOException {
-		Vocabulary voc = new Vocabulary();
-		HashMap<String,VocabularyEntry> vocabulary = new HashMap<String,VocabularyEntry>();
+	protected void SearchButtonActionPerformed(ActionEvent evt, HashMap<String,VocabularyEntry> vocabulary) throws IOException {
+		//Vocabulary voc = new Vocabulary();
+		//HashMap<String,VocabularyEntry> vocabulary = new HashMap<String,VocabularyEntry>();
         RetrievalModel model = null;
 
         /* Start counting time */
@@ -199,9 +199,11 @@ public class QueryGUI {
         start = System.currentTimeMillis();
         System.out.println("QueryEvaluator starts!");
 
-        /* Load Vocabulary from File into memory */
-        voc.setVocabulary("VocabularyFile.txt");
-        vocabulary = voc.getVocabulary();        
+        // MOVED TO QUERYEVALUATOR TO PREVENT OF RE-CREATING
+        // VOCABULARY EACH TIME
+//        /* Load Vocabulary from File into memory */
+//        voc.setVocabulary("VocabularyFile.txt");
+//        vocabulary = voc.getVocabulary();        
 
         /* According to the selected Retrieval model by user, instantiate it */
         model = chooseRetrievalModel(retrievalModel, vocabulary);
@@ -258,7 +260,7 @@ public class QueryGUI {
 		return qMap.get(word).get();
 	}
 	public void setqMap(HashMap<String, MutableInt> qMap) {
-		this.qMap = qMap;
+		QueryGUI.qMap = qMap;
 	}
 	
 	public static void addToQmap(String word) {

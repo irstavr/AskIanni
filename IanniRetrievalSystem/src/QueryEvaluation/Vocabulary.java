@@ -45,11 +45,11 @@ public class Vocabulary {
 				
 			
 				String term = new String(lineStrings[0].getBytes("UTF-8"), "UTF-8");
-				/*System.out.print("term: "+term);
+				/*System.out.print("term: "+term);*/
 				System.out.print(" | df: "+lineStrings[1]);
 				System.out.print(" | startPos: "+lineStrings[2]);
 				System.out.println(" | readBytes: "+lineStrings[3]);
-*/
+
 				// add from file to the vocabulary
 				addToVocabulary(term,Long.parseLong(lineStrings[1]),Integer.parseInt(lineStrings[2]),Integer.parseInt(lineStrings[3]));				
 			}		
