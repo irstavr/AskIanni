@@ -6,6 +6,8 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import mitos.stemmer.Stemmer;
+
 
 public class OKAPIBM25 implements RetrievalModel {
 	Vocabulary Voc;
@@ -13,17 +15,18 @@ public class OKAPIBM25 implements RetrievalModel {
 
     public OKAPIBM25() {
 		this.Voc = new Vocabulary();
+		Stemmer.Initialize();
 	}
 
-    public HashMap<String,ScoreEntry> evaluateQuery(String query) throws IOException {
+    public HashMap<String,Double> evaluateQuery(String[] token) throws IOException {
     	//Get num of docs
     	int numDocs = Vocabulary.getNumOfDocuments();
 
     	//List with scores for every doc
-    	HashMap<String,ScoreEntry> docScores = new HashMap<String, ScoreEntry>();
+    	HashMap<String,Double> docScores = new HashMap<String, Double>();
     
     	//Tokenize the query
-    	String[] tokens = tokenizeQuery(query);
+    	//String[] tokens = tokenizeQuery(query);
                 
     	double avgdl = Voc.getAvgdl();
         double score;
@@ -33,9 +36,9 @@ public class OKAPIBM25 implements RetrievalModel {
 
         while (it.hasNext()) {
             String docID = it.next();
-            score = scoreOKAPIBM25(tokens, numDocs, docID, avgdl, 2.0, 0.75);
+            score = scoreOKAPIBM25(token, numDocs, docID, avgdl, 2.0, 0.75);
             if (score > 0) {
-            	docScores.put(docID, (new ScoreEntry((new Double(score)).floatValue(), docID)) );
+            	docScores.put(docID, new Double(score) );
             }
         }
         //ScoreEntry[] results = (ScoreEntry[]) scores.toArray(new ScoreEntry[scores.size()]);        

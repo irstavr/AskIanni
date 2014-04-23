@@ -1,16 +1,18 @@
 package QueryEvaluation;
 
+import java.util.Comparator;
+
 /**
  * 
  * Represents class for scores for retrieval models.
  *
  */
-public class ScoreEntry {
+public class ScoreEntry implements Comparable<ScoreEntry> {
 
-	private float score;
+	private Double score;
     private String docID;
 
-    public ScoreEntry(float score, String docID) {
+    public ScoreEntry(Double score, String docID) {
         this.score = score;
         this.docID = docID;
     }
@@ -19,7 +21,7 @@ public class ScoreEntry {
         return docID;
     }
 
-    public float getScore() {
+    public Double getScore() {
         return score;
     }
 
@@ -27,21 +29,19 @@ public class ScoreEntry {
         this.docID = docID;
     }
 
-    public void setScore(float score) {
+    public void setScore(Double score) {
         this.score = score;
     }
 
-    public int compare(Object o1, Object o2) {
-        ScoreEntry sc1 = (ScoreEntry)o1;
-        ScoreEntry sc2 = (ScoreEntry)o2;
-        float d1 = sc1.getScore();
-        float d2 = sc2.getScore();
-        if (d1 - d2 > 0)
-            return 1;
-        else if (d1 - d2 < 0)
-            return -1;
-        else
-            return 0;
-    }
+  
+
+
+
+
+	@Override
+	public int compareTo(ScoreEntry o) {
+		// TODO Auto-generated method stub
+		return o.getScore().compareTo(this.getScore());
+	}
 
 }

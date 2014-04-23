@@ -94,7 +94,7 @@ public class Parser {
 				RandomAccessFile rafFile = new RandomAccessFile(
 						f.getAbsolutePath(), "rw");
 				
-				
+				wordPos = 0;
 				while ((line = bufReader.readLine()) != null) {
 					i =0;
 					

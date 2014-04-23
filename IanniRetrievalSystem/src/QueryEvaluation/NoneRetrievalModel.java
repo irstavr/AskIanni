@@ -11,15 +11,15 @@ public class NoneRetrievalModel implements RetrievalModel{
 	public NoneRetrievalModel() {
 	}
 
-	public HashMap<String,ScoreEntry> evaluateQuery(String query) {
+	public HashMap<String,Double> evaluateQuery(String[] token) {
 		
 		//create new score entries for this list of documents
-		HashMap<String, ScoreEntry> scores = new HashMap<String, ScoreEntry>();
+		HashMap<String, Double> scores = new HashMap<String, Double>();
         
         Iterator<String> it = ((Set<String>) docs).iterator();
         while (it.hasNext()) {
         	String id = it.next();
-        	scores.put(id, new ScoreEntry(1, id));
+        	scores.put(id, (double) 1);
         }
         return scores;
 	}

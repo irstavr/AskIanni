@@ -9,6 +9,7 @@ import java.io.PrintStream;
 import java.io.RandomAccessFile;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -56,7 +57,7 @@ public class Indexer {
 		documents = parser.getDocsList();
 		vocabulary = parser.getVocabulary();
 		maxtfdoc = parser.getMaxtfdoc();
-		
+		System.out.println("MAX : " + Collections.max(maxtfdoc.values()));
 		createAllFiles();
 		stop = System.currentTimeMillis();
 		printNumOfDiffWords();

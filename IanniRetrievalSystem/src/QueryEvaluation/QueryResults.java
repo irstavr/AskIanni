@@ -5,7 +5,11 @@ import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.StringTokenizer;
 import java.util.Map.Entry;
+
+import mitos.stemmer.Stemmer;
 
 public class QueryResults {
 	String query;
@@ -41,16 +45,33 @@ public class QueryResults {
 		return results;
 	}
 
+    private String[] tokenizeQuery(String query) {
+    	Stemmer.Initialize();
+        StringTokenizer tokenized = new StringTokenizer(query.toLowerCase());
+        int numTokens = tokenized.countTokens();
+        String[] tokens = new String[numTokens];
+        int i = 0;
+        while (tokenized.hasMoreTokens()) {
+            String token = tokenized.nextToken();
+            System.out.print("Bf stem : " + token + " \t after stem");
+            token = Stemmer.Stem(token);
+            System.out.println(token);
+            tokens[i++] = token;
+        }
+        return tokens;
+    }
 	public ArrayList<String> createResults() throws IOException {
 		
-		String[] terms = query.split("\\s+");
+		String[] terms = tokenizeQuery(query);
 		
 		// tokenized query terms
 		for ( int i=0; i<terms.length; i++ ) {			
 			
+			
 			// Find term on vocabulary and its datas
+		
 			VocabularyEntry term = this.voc.get(terms[i]);
-	
+			
 			/* if term is not found -- none results! */
 			if ( term != null ) {
 				/* Get the df of this term */
@@ -62,7 +83,8 @@ public class QueryResults {
 				/* Get the pointer to the PostingFile.txt */
 				int posStart = term.getPosStart();
 				int bytesLength = term.getBytesLength();
-	
+				
+			
 				/* Get the infos from PostingFile */
 				getDocsFromPostingFile(posStart,bytesLength);
 
@@ -70,10 +92,9 @@ public class QueryResults {
 				results.add("None result found!");
 			}
 		}
-
 		/* get the score depending on the selected model */
 		model.setDocsList(docsIDPathMap.keySet());	
-		HashMap<String,ScoreEntry> scores = model.evaluateQuery(query);
+		Map<String, Double> scores = model.evaluateQuery(terms);
 		
 		/* print infos to the GUI */
 		Iterator<Entry<String,String>> it = docsIDPathMap.entrySet().iterator();
@@ -83,9 +104,12 @@ public class QueryResults {
 
 			gui.getTextArea().append("Doc:"+ entry.getKey());
 			gui.getTextArea().append(" | Path"+ entry.getValue());
-			gui.getTextArea().append(" | Score"+ scores.get(entry.getKey()).getScore() );
+			gui.getTextArea().append(" | Score"+ scores.get(entry.getKey()));
 			gui.getTextArea().append(" | " + getSnippet(entry.getValue(),entry.getKey())+"\n");
 		}
+		
+		//for(String s : scores.keySet())
+			//System.out.println("String s : " + s);
 		return this.results;
 	}
 
@@ -129,23 +153,22 @@ public class QueryResults {
 				
 		while(file.getFilePointer() < posStart+bytesLength) {
             String line = file.readLine();
-            System.out.println(line);
             
 			String[] lineStrings = line.split("\\s+");
 			
 			
-			byte[] bytes = new byte[lineStrings[1].length()];
-			String term = new String(bytes, "UTF-8");
-			System.out.print("docID: "+lineStrings[0]);
+			byte[] bytes = lineStrings[1].getBytes("UTF-8");
+			String term = new String(bytes,"UTF-8");
+			
+			/*System.out.print("docID: "+lineStrings[0]);
 			System.out.print(" | term: "+term);
 			System.out.print(" | tfTerm: "+lineStrings[2]);
 			System.out.print(" | posStart: "+lineStrings[3]);
+		
 			System.out.print(" | bytesToRead: "+lineStrings[4]);
-
-			System.out.print(" | positions:");
+			System.out.print(" | positions:");*/
+			
 			for (int i=5; i< lineStrings.length; i++) {
-				System.out.print(" "+ lineStrings[i]);
-				
 				if ( wordPos.containsKey(lineStrings[0]) ) {
 					ArrayList<Long> pos = wordPos.get(lineStrings[0]);	//get pos list of this DocID
 					pos.add(Long.parseLong(lineStrings[i]));				//add new pos to the list
@@ -160,11 +183,13 @@ public class QueryResults {
 			}
 			
 			/* store TF into the map */
+		
 			if ( getTermTFs().containsKey(term) ) {				
 				HashMap<String,Float> tfs = getTermTFs().get(term);
 				tfs.put(lineStrings[0], Float.parseFloat(lineStrings[2]));
 				getTermTFs().put(term, tfs);			
 			} else {
+		
 				HashMap<String,Float> tfs = new HashMap<>();
 				tfs.put(lineStrings[0], Float.parseFloat(lineStrings[2]));
 				getTermTFs().put(term, tfs);
@@ -184,7 +209,7 @@ public class QueryResults {
 
 		while(file.getFilePointer() < posStart+bytesLength) {
             String line = file.readLine();
-            System.out.println("\n\nPostingFileLine= "+line);
+            //System.out.println("\n\nPostingFileLine= "+line);
  
 			String[] lineStrings = line.split("\\s+");
 			

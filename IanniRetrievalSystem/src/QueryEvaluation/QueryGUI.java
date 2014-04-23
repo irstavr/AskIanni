@@ -5,6 +5,8 @@ import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 
 import javax.swing.ButtonGroup;
@@ -26,7 +28,8 @@ public class QueryGUI {
 	private JTextField queryField;
 	private JTextArea textArea;
 	int retrievalModel = 0;
-
+	private static HashMap<String, MutableInt> qMap;
+	private static int qMaxFreq;
 	/**
 	 * Launch the application.
 	 */
@@ -54,6 +57,7 @@ public class QueryGUI {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
+		qMap = new HashMap<String, MutableInt>();
 		frame = new JFrame();
 		frame.getContentPane().setBackground(Color.DARK_GRAY);
 		frame.setBackground(Color.DARK_GRAY);
@@ -234,7 +238,7 @@ public class QueryGUI {
 
 	/* Print statistics of the program time and size of results data */
 	private static void printStatistics(long total_time, Object total_results) {		// TO CHANGE: set res type to long
-		System.out.println("Time: " + ((double)total_time/100)/1000 );
+		System.out.println("Time: " + ((double)total_time/1000)%60 );
 	}
 
 	/* used on QueryResults in order to print straightly the results on the GUI */
@@ -245,4 +249,62 @@ public class QueryGUI {
 	public void setTextArea(JTextArea textArea) {
 		this.textArea = textArea;
 	}
+
+	public static HashMap<String, MutableInt> getqMap() {
+		return qMap;
+	}
+
+	public static int getqMapTF(String word) {
+		return qMap.get(word).get();
+	}
+	public void setqMap(HashMap<String, MutableInt> qMap) {
+		this.qMap = qMap;
+	}
+	
+	public static void addToQmap(String word) {
+		MutableInt count = qMap.get(word);
+		
+		if(count == null)
+		{
+			qMap.put(word, new MutableInt());
+		}
+		else
+		{
+			qMap.get(word).increment();
+		}
+		//int maxValueInMap=(Collections.max(qMap.values()));
+		qMaxFreq = Collections.max(qMap.values(),new MyComparator()).get();
+		
+	}
+
+	protected static class MyComparator implements Comparator<MutableInt>
+	{
+
+		@Override
+		public int compare(MutableInt o1, MutableInt o2) {
+			// TODO Auto-generated method stub
+			if(o1.get() > o2.get())
+			{
+				return 1;
+			}
+			else if (o1.get()<o2.get())
+			{
+				return -1;
+			}
+			else
+			{
+				return 0;
+			}
+		}
+		
+	}
+	public static float getqMaxFreq() {
+		return qMaxFreq;
+	}
+
+	public static void setqMaxFreq(int qMaxFreq) {
+		QueryGUI.qMaxFreq = qMaxFreq;
+	}
+	
+	
 }
