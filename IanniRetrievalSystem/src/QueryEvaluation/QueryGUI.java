@@ -5,9 +5,11 @@ import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 
 import javax.swing.ButtonGroup;
 import javax.swing.GroupLayout;
@@ -190,37 +192,34 @@ public class QueryGUI {
 	}
 
 	protected void SearchButtonActionPerformed(ActionEvent evt, HashMap<String,VocabularyEntry> vocabulary) throws IOException {
-		//Vocabulary voc = new Vocabulary();
-		//HashMap<String,VocabularyEntry> vocabulary = new HashMap<String,VocabularyEntry>();
         RetrievalModel model = null;
 
         /* Start counting time */
         long start, stop;
         start = System.currentTimeMillis();
-        System.out.println("QueryEvaluator starts!");
 
-        // MOVED TO QUERYEVALUATOR TO PREVENT OF RE-CREATING
-        // VOCABULARY EACH TIME
-//        /* Load Vocabulary from File into memory */
-//        voc.setVocabulary("VocabularyFile.txt");
-//        vocabulary = voc.getVocabulary();        
-
+        this.textArea.setEnabled(true);
+        this.textArea.setAutoscrolls(true);
+        this.textArea.setText("");
+        
         /* According to the selected Retrieval model by user, instantiate it */
         model = chooseRetrievalModel(retrievalModel, vocabulary);
 
         /* Get the query results */
         System.out.println(">Query: "+ queryField.getText());
-        QueryResults res = new QueryResults(this, vocabulary, model, queryField.getText());
-        res.createResults();
+        QueryResults res = new QueryResults(vocabulary, model, queryField.getText());
+        ArrayList<String> results = res.createResults();
 
-        getTextArea().setEnabled(true);
-                
+        Iterator<String> it = results.iterator();
+        while (it.hasNext()) {
+        	this.textArea.append(it.next()+"\n");
+        }
+        
         /* Stop counting time */
         stop = System.currentTimeMillis();
 
         /* Print Statistics */
         printStatistics(stop - start, res);
-        System.out.println("QueryEvaluator ends!");
 	}
 
 
@@ -259,6 +258,7 @@ public class QueryGUI {
 	public static int getqMapTF(String word) {
 		return qMap.get(word).get();
 	}
+	
 	public void setqMap(HashMap<String, MutableInt> qMap) {
 		QueryGUI.qMap = qMap;
 	}
@@ -274,7 +274,6 @@ public class QueryGUI {
 		{
 			qMap.get(word).increment();
 		}
-		//int maxValueInMap=(Collections.max(qMap.values()));
 		qMaxFreq = Collections.max(qMap.values(),new MyComparator()).get();
 		
 	}
@@ -284,7 +283,6 @@ public class QueryGUI {
 
 		@Override
 		public int compare(MutableInt o1, MutableInt o2) {
-			// TODO Auto-generated method stub
 			if(o1.get() > o2.get())
 			{
 				return 1;

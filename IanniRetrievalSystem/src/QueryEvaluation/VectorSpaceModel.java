@@ -28,7 +28,7 @@ public class VectorSpaceModel implements RetrievalModel {
 		Stemmer.Initialize();
 	}
 
-	public Map<String, Double> evaluateQuery(String[] token) throws IOException {
+	public HashMap<String, Double> evaluateQuery(String[] token) throws IOException {
 		HashMap<String, Double> results = new HashMap<String, Double>();
 		
 		docTermWeight();
@@ -72,13 +72,12 @@ public class VectorSpaceModel implements RetrievalModel {
 					wVectLen += termVectorLength(docID);
 					finalScore = (innerProduct / (Math.sqrt(wVectLen * qVectLen)));
 					results.put(docID, finalScore);
-					// System.out.println("Score " + finalScore);
 				}
 			}
 		}
 		wVectLen = 0;
 
-		return this.sortByValue(results);
+		return (HashMap<String, Double>) this.sortByValue(results);
 	}
 
 	private void docTermWeight() throws IOException {
@@ -119,8 +118,6 @@ public class VectorSpaceModel implements RetrievalModel {
 				double termWeight = termIdf * termTf;
 				this.addTermMap(lineStrings[0], term, termWeight);
 			}
-			// System.out.print("term: "+ term +"\t termIDF : "+lineStrings[0] +
-			// " termTF  : " + termTf + "termWeight" + termWeight + "\n");
 		}
 		
 		file.close();
@@ -194,12 +191,12 @@ public class VectorSpaceModel implements RetrievalModel {
 	     Map<K, V> result = new LinkedHashMap<K, V>();
 	     for (Map.Entry<K, V> entry : list)
 	     {
-	    	 System.out.println("entry key : " + entry.getKey() + "entry val : " + entry.getValue());
+	    	 //System.out.println("entry key : " + entry.getKey() + "entry val : " + entry.getValue());
 	         result.put( entry.getKey(), entry.getValue() );
 	     }
 	     
-	     for(K s : result.keySet())
-	    	 System.out.println("String s " + s );
+	     //for(K s : result.keySet())
+	    	// System.out.println("String s " + s );
 	     return result;
 	 }
 	 
@@ -209,7 +206,7 @@ public class VectorSpaceModel implements RetrievalModel {
 
 	@Override
 	public void setDocsList(Set<String> docsList) {
-		this.setDocsIDs(docsList);
+		this.docsIDs = docsList;
 	}
 
 	/**
@@ -219,11 +216,5 @@ public class VectorSpaceModel implements RetrievalModel {
 		return docsIDs;
 	}
 
-	/**
-	 * @param docsIDs the docsIDs to set
-	 */
-	public void setDocsIDs(Set<String> docsIDs) {
-		this.docsIDs = docsIDs;
-	}
 
 }

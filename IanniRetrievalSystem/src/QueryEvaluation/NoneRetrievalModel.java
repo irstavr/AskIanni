@@ -26,7 +26,6 @@ public class NoneRetrievalModel implements RetrievalModel{
 	
 	@Override
 	public void setDocsList(Set<String> docsList) {
-		System.out.println("setDocsList sto NoneRetrieavalModel");
 		this.docs = docsList;
 	}
 	

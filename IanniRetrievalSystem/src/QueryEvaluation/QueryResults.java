@@ -17,7 +17,6 @@ public class QueryResults {
 	HashMap<String,VocabularyEntry> voc;
 	ScoreEntry[] scoreEntry;
 	RetrievalModel model;
-	private QueryGUI gui;
 	private HashMap<String,String> docsIDPathMap;						/* key: docID, value: path */
 	
 	private HashMap<String,ArrayList<Long>> wordPos;					/* key: docID, value: positions of this word in it 	*/
@@ -27,8 +26,7 @@ public class QueryResults {
 	private static HashMap<String,HashMap<String,Float>> termTFs;		/* key: term , value: map<docID,tf>					*/
 	private static int sumDocLength;
 
-	public QueryResults(QueryGUI gui, HashMap<String,VocabularyEntry> voc, RetrievalModel model, String query) throws IOException {
-		this.gui = gui;
+	public QueryResults(HashMap<String,VocabularyEntry> voc, RetrievalModel model, String query) throws IOException {
 		this.voc = voc;
 		this.model = model;
 		this.query = query;
@@ -53,25 +51,23 @@ public class QueryResults {
         int i = 0;
         while (tokenized.hasMoreTokens()) {
             String token = tokenized.nextToken();
-            System.out.print("Bf stem : " + token + " \t after stem");
             token = Stemmer.Stem(token);
             System.out.println(token);
             tokens[i++] = token;
         }
         return tokens;
     }
+    
 	public ArrayList<String> createResults() throws IOException {
 		
 		String[] terms = tokenizeQuery(query);
 		
 		//Tokenized query terms
-		for ( int i=0; i<terms.length; i++ ) {			
-			
-			
+		for ( int i=0; i<terms.length; i++ ) {
+						
 			// Find term on vocabulary and its datas
-		
 			VocabularyEntry term = this.voc.get(terms[i]);
-			
+
 			/* if term is not found -- none results! */
 			if ( term != null ) {
 				/* Get the df of this term */
@@ -83,15 +79,14 @@ public class QueryResults {
 				/* Get the pointer to the PostingFile.txt */
 				int posStart = term.getPosStart();
 				int bytesLength = term.getBytesLength();
-				
 			
 				/* Get the infos from PostingFile */
 				getDocsFromPostingFile(posStart,bytesLength);
-
 			} else {
 				results.add("None result found!");
 			}
 		}
+		
 		/* get the score depending on the selected model */
 		model.setDocsList(docsIDPathMap.keySet());	
 		Map<String, Double> scores = model.evaluateQuery(terms);
@@ -101,15 +96,14 @@ public class QueryResults {
 		
 		while (it.hasNext()) {
 			Entry<String,String> entry =  it.next();			
-
-			gui.getTextArea().append("Doc:"+ entry.getKey());
-			gui.getTextArea().append(" | Path"+ entry.getValue());
-			gui.getTextArea().append(" | Score"+ scores.get(entry.getKey()));
-			gui.getTextArea().append(" | " + getSnippet(entry.getValue(),entry.getKey())+"\n");
+//			gui.getTextArea().append("Doc:"+ entry.getKey());
+//			gui.getTextArea().append(" | Path"+ entry.getValue());
+//			gui.getTextArea().append(" | Score"+ scores.get(entry.getKey()));
+//			gui.getTextArea().append(" | " + getSnippet(entry.getValue(),entry.getKey())+"\n");
+			
+			results.add(entry.getKey()+" "+ entry.getValue() + " "+ scores.get(entry.getKey()) + " "+ getSnippet(entry.getValue(),entry.getKey()));
 		}
 		
-		//for(String s : scores.keySet())
-			//System.out.println("String s : " + s);
 		return this.results;
 	}
 
@@ -134,7 +128,7 @@ public class QueryResults {
 					file.seek(positions.get(0));
 					//while(file.getFilePointer() < positions.get(0)+50) {
 			            line = file.readLine();
-			            System.out.println("Snippet ("+docID+") = "+line);
+			            //System.out.println("Snippet ("+docID+") = "+line);
 			          //  break;
 					//}
 				}
@@ -160,19 +154,12 @@ public class QueryResults {
 			byte[] bytes = lineStrings[1].getBytes("UTF-8");
 			String term = new String(bytes,"UTF-8");
 			
-			/*System.out.print("docID: "+lineStrings[0]);
-			System.out.print(" | term: "+term);
-			System.out.print(" | tfTerm: "+lineStrings[2]);
-			System.out.print(" | posStart: "+lineStrings[3]);
-		
-			System.out.print(" | bytesToRead: "+lineStrings[4]);
-			System.out.print(" | positions:");*/
 			
 			for (int i=5; i< lineStrings.length; i++) {
 				if ( wordPos.containsKey(lineStrings[0]) ) {
 					ArrayList<Long> pos = wordPos.get(lineStrings[0]);	//get pos list of this DocID
-					pos.add(Long.parseLong(lineStrings[i]));				//add new pos to the list
-					wordPos.put(lineStrings[0], pos);						//update map with new list
+					pos.add(Long.parseLong(lineStrings[i]));			//add new pos to the list
+					wordPos.put(lineStrings[0], pos);					//update map with new list
 				} else {
 					ArrayList<Long> pos = new ArrayList<Long>();	//create new list with only this pos
 					pos.add(Long.parseLong(lineStrings[i]));
@@ -209,15 +196,11 @@ public class QueryResults {
 
 		while(file.getFilePointer() < posStart+bytesLength) {
             String line = file.readLine();
-            //System.out.println("\n\nPostingFileLine= "+line);
- 
-			String[] lineStrings = line.split("\\s+");
+            String[] lineStrings = line.split("\\s+");
 			
 			docsIDPathMap.put(lineStrings[0], lineStrings[1]);	/* add the docID with its path to the map */
 			
-			//String format = lineStrings[2];
 			setSumDocLength(getSumDocLength() + Integer.parseInt(lineStrings[3]));
-			
 		}
 		file.close();
 	}
@@ -229,8 +212,15 @@ public class QueryResults {
 
 	public static float getTermTFInDoc(String term, String docID) {
 		
-		HashMap<String,Float> tfs = getTermTFs().get(term);
-		return tfs.get(docID);
+		if ( termDFs.containsKey(term)) { 
+			HashMap<String,Float> tfs = termTFs.get(term);
+			if ( tfs.containsKey(docID)) {
+				return tfs.get(docID);
+			}
+			return 0;
+		} else {
+			return 0;
+		}
 	}
 
 	/**

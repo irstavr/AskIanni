@@ -16,6 +16,7 @@ public class QueryEvaluator {
         voc.setVocabulary("VocabularyFile.txt");
 		HashMap<String,VocabularyEntry> vocabulary = voc.getVocabulary();        
 
+		/* Create GUI */
 		QueryGUI.main(vocabulary);
     }
 }
