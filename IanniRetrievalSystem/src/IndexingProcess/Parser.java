@@ -58,7 +58,8 @@ public class Parser {
 	/* parsing files and erase every whitespace,number,sign */
 	private void parse(String directory) throws IOException {
 		File dir = new File(directory);
-		String delimiter = "\\s+\t\n\r\f\b!@#$%^&*;:'\\\".,0123456789()_-[]{}<>?|~`+-=/ \\'«»§΄―—’‘–°·";
+		String delimiter = "\t\n\r\f\b!@#$%^&*;:'\\\".,0123456789()_-[]{}<>?|~`+-=/ \\'«»§΄―—’‘–°·";
+		//String delimiter = "\t\n\r\f\\ ";
 		Word word = null;
 		
 		int maxFreq = 0;
@@ -85,17 +86,21 @@ public class Parser {
 					i =0;
 					
 					tokenizer = new StringTokenizer(line, delimiter);
-
+					System.out.println("Line : " + line.length());
+					
 					while (tokenizer.hasMoreTokens()) {
 						token = tokenizer.nextToken().toLowerCase();
 					
 						d.incrementWordsCounter();
+						for( ;(i<line.length()) && (delimiter.indexOf(line.charAt(i))>-1); i++,wordPos++) 
+							;//System.out.println(line.charAt(i)  + "  i : " + i);
 						int tempos = wordPos;
+						System.out.println("\tWordPos : " + wordPos + "   i : " + i +  "   token : " + token);
 						
-						for( ;(i<line.length()) && (delimiter.indexOf(line.charAt(i))>-1); i++,wordPos++);
 						wordPos += token.length();
 						i+= token.length();
-						
+						for( ;(i<line.length()) && (delimiter.indexOf(line.charAt(i))>-1); i++,wordPos++) 
+							;
 						token = Stemmer.Stem(token);
 						if (!isStopWord(token)) {
 							word = new Word(token);
@@ -108,7 +113,7 @@ public class Parser {
 							}
 							word.addToPosList(d.getDocumentID(), tempos);
 						}
-						wordPos++;
+						
 						
 						if (word != null) {
 							if (word.getMaxTFDoc().containsKey(
@@ -122,7 +127,9 @@ public class Parser {
 							vocabulary.put(word.getWord(), word);
 						}
 					}
+					wordPos++;
 				}
+				
 				bufReader.close();
 				docFile.write(Long.toString(d.getDocumentID()).getBytes(
 						Charset.forName("UTF-8")));

@@ -121,7 +121,7 @@ public class Indexer {
 		postingFile.close();
 		vocabularyFile.close();
 		
-		readFromFile("my.txt", 45, 20);
+	
 	}
 
 	private static void createFolder() {
@@ -142,7 +142,7 @@ public class Indexer {
 		file.read(bytes);
 
 		String s = new String(bytes, "UTF-8");
-		System.out.println(s);
+		System.out.println("String here " + s);
 
 		file.close();	
 	}
