@@ -5,6 +5,7 @@ import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.Map.Entry;
@@ -15,7 +16,6 @@ public class QueryResults {
 	private static String query;
 	private static ArrayList<String> results;
 	private static HashMap<String,VocabularyEntry> voc;
-	//private static ScoreEntry[] scoreEntry;
 	private static RetrievalModel model;
 	private static HashMap<String,String> docsIDPathMap;					/* key: docID, value: path */
 	
@@ -31,7 +31,6 @@ public class QueryResults {
 		QueryResults.model = model;
 		QueryResults.query = query;
 		QueryResults.results = new ArrayList<String>();
-		//QueryResults.scoreEntry = null;
 		QueryResults.docsIDPathMap = new HashMap<String,String>();
 		QueryResults.wordPos = new HashMap<String,ArrayList<Long>>();
 		QueryResults.pos = new HashMap<String, HashMap<String, ArrayList<Long>>>();
@@ -110,9 +109,12 @@ public class QueryResults {
 	/* Retrieves from this docID located at this path, a snippet that contains the query word */
 	private String getSnippet(String path, String docID) throws IOException {
 		RandomAccessFile file = new RandomAccessFile(path, "r");
-		String line=null;
+		String line = new String();
+		System.out.println("snippet: ");
+
+		System.out.println("file: "+path);
 		
-		String[] terms = query.split("\\s+");
+		String[] terms = tokenizeQuery(query);
 		
 		for ( int i =0; i<terms.length; i++ ) {			
 			String word = terms[i];
@@ -123,14 +125,28 @@ public class QueryResults {
 				if ( docPos.containsKey(docID) ) {
 					/* Get the positions of the query word ( ONE WORD ) on this doc */
 					ArrayList<Long> positions = docPos.get(docID);
-					
-					/* get just one example of the positions */
-					file.seek(positions.get(0));
-					//while(file.getFilePointer() < positions.get(0)+50) {
-			            line = file.readLine();
-			            //System.out.println("Snippet ("+docID+") = "+line);
-			          //  break;
-					//}
+					System.out.println("position: "+positions.get(0));
+
+					for (Long pos : positions) {
+						
+						/* get just one example of the positions */
+						while (pos > 0) {
+							pos -= 1;
+						
+							file.seek(pos);
+
+							line = file.readLine();
+					        if ( line!=null) {
+						    	List<Integer> matches = new BoyerMooreAlg().match(word, line);
+
+						    	for (Integer integer : matches) {
+									System.out.println("Match at: " + integer);
+						    	}
+						    	break;
+					        }
+						}			        
+						
+					}
 				}
 			}
 		}
