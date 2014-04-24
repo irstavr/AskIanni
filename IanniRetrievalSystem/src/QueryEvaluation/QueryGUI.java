@@ -17,7 +17,6 @@ import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JProgressBar;
 import javax.swing.JRadioButton;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
@@ -25,13 +24,13 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 
 
 public class QueryGUI {
-
+	private static HashMap<String, MutableInt> qMap;
 	private JFrame frame;
 	private JTextField queryField;
 	private JTextArea textArea;
-	int retrievalModel = 0;
-	private static HashMap<String, MutableInt> qMap;
 	private static int qMaxFreq;
+	int retrievalModel = 0;
+
 	/**
 	 * Launch the application.
 	 */
@@ -76,7 +75,6 @@ public class QueryGUI {
 				try {
 					SearchButtonActionPerformed(evt,vocabulary);
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
@@ -112,8 +110,6 @@ public class QueryGUI {
             }
         });
 		buttonGroup.add(OKAPIButton);
-
-		JProgressBar progressBar = new JProgressBar();
 		
 		JLabel lblChooseRetrievalModel = new JLabel("Choose retrieval model:");
 		lblChooseRetrievalModel.setForeground(Color.LIGHT_GRAY);
@@ -130,7 +126,6 @@ public class QueryGUI {
 					.addContainerGap()
 					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
 						.addGroup(groupLayout.createSequentialGroup()
-							.addComponent(progressBar, GroupLayout.DEFAULT_SIZE, 853, Short.MAX_VALUE)
 							.addContainerGap())
 						.addGroup(groupLayout.createSequentialGroup()
 							.addComponent(getTextArea(), GroupLayout.DEFAULT_SIZE, 853, Short.MAX_VALUE)
@@ -168,29 +163,26 @@ public class QueryGUI {
 							.addGap(124)))
 					.addComponent(getTextArea(), GroupLayout.DEFAULT_SIZE, 74, Short.MAX_VALUE)
 					.addGap(18)
-					.addComponent(progressBar, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 					.addContainerGap())
 		);
 		frame.getContentPane().setLayout(groupLayout);
 	}
-		
-
-	protected void OKAPIButtonActionPerformed(ActionEvent evt) {
-		System.out.println("OKAPI Retrieval MOdel");
-		retrievalModel = 2;
-		
-	}
-
-	protected void VectorButtonActionPerformed(ActionEvent evt) {
-		System.out.println("Vector Retrieval MOdel");
-		retrievalModel = 1;
-	}
-
+	
 	protected void NoneModelButtonActionPerformed(ActionEvent evt) {
 		System.out.println("None Retrieval MOdel");
 		retrievalModel = 0;
 	}
-
+	
+	protected void VectorButtonActionPerformed(ActionEvent evt) {
+		System.out.println("Vector Retrieval MOdel");
+		retrievalModel = 1;
+	}
+	
+	protected void OKAPIButtonActionPerformed(ActionEvent evt) {
+		System.out.println("OKAPI Retrieval MOdel");
+		retrievalModel = 2;	
+	}
+	
 	protected void SearchButtonActionPerformed(ActionEvent evt, HashMap<String,VocabularyEntry> vocabulary) throws IOException {
         RetrievalModel model = null;
 
@@ -266,38 +258,27 @@ public class QueryGUI {
 	public static void addToQmap(String word) {
 		MutableInt count = qMap.get(word);
 		
-		if(count == null)
-		{
+		if(count == null) {
 			qMap.put(word, new MutableInt());
-		}
-		else
-		{
+		} else {
 			qMap.get(word).increment();
 		}
 		qMaxFreq = Collections.max(qMap.values(),new MyComparator()).get();
-		
 	}
 
-	protected static class MyComparator implements Comparator<MutableInt>
-	{
-
+	protected static class MyComparator implements Comparator<MutableInt> {
 		@Override
 		public int compare(MutableInt o1, MutableInt o2) {
-			if(o1.get() > o2.get())
-			{
+			if(o1.get() > o2.get()) {
 				return 1;
-			}
-			else if (o1.get()<o2.get())
-			{
+			} else if (o1.get()<o2.get()) {
 				return -1;
-			}
-			else
-			{
+			} else {
 				return 0;
 			}
 		}
-		
 	}
+	
 	public static float getqMaxFreq() {
 		return qMaxFreq;
 	}
@@ -305,6 +286,4 @@ public class QueryGUI {
 	public static void setqMaxFreq(int qMaxFreq) {
 		QueryGUI.qMaxFreq = qMaxFreq;
 	}
-	
-	
 }

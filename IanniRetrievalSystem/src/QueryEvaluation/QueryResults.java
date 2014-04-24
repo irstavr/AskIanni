@@ -37,6 +37,7 @@ public class QueryResults {
         this.pos = new HashMap<String, HashMap<String, ArrayList<Long>>>();
         QueryResults.setTermDFs(new HashMap<String,Float>());
         QueryResults.setTermTFs(new HashMap<String, HashMap<String,Float> >());
+        QueryResults.sumDocLength = 0;
 	}
 
 	public ArrayList<String> getResults() {
@@ -62,7 +63,7 @@ public class QueryResults {
 		
 		String[] terms = tokenizeQuery(query);
 		
-		//Tokenized query terms
+		// tokenized query terms
 		for ( int i=0; i<terms.length; i++ ) {
 						
 			// Find term on vocabulary and its datas
@@ -73,7 +74,7 @@ public class QueryResults {
 				/* Get the df of this term */
 				float df = term.getDf();
 	
-				/* add df of this term to the map */
+				/* Add df of this term to the map */
 				getTermDFs().put(terms[i], df);
 				
 				/* Get the pointer to the PostingFile.txt */
@@ -95,13 +96,12 @@ public class QueryResults {
 		Iterator<Entry<String,String>> it = docsIDPathMap.entrySet().iterator();
 		
 		while (it.hasNext()) {
-			Entry<String,String> entry =  it.next();			
-//			gui.getTextArea().append("Doc:"+ entry.getKey());
-//			gui.getTextArea().append(" | Path"+ entry.getValue());
-//			gui.getTextArea().append(" | Score"+ scores.get(entry.getKey()));
-//			gui.getTextArea().append(" | " + getSnippet(entry.getValue(),entry.getKey())+"\n");
+			Entry<String,String> entry =  it.next();
 			
-			results.add(entry.getKey()+" "+ entry.getValue() + " "+ scores.get(entry.getKey()) + " "+ getSnippet(entry.getValue(),entry.getKey()));
+			results.add(entry.getKey()+ " " + 							/* docId */
+						entry.getValue() + " " + 						/* path */
+						scores.get(entry.getKey()) + " " + 				/* score */
+						getSnippet(entry.getValue(),entry.getKey()));	/* snippet */
 		}
 		
 		return this.results;
@@ -146,15 +146,12 @@ public class QueryResults {
 		file.seek(posStart);
 				
 		while(file.getFilePointer() < posStart+bytesLength) {
-            String line = file.readLine();
-            
+            String line = file.readLine();            
 			String[] lineStrings = line.split("\\s+");
-			
-			
+						
 			byte[] bytes = lineStrings[1].getBytes("UTF-8");
 			String term = new String(bytes,"UTF-8");
-			
-			
+						
 			for (int i=5; i< lineStrings.length; i++) {
 				if ( wordPos.containsKey(lineStrings[0]) ) {
 					ArrayList<Long> pos = wordPos.get(lineStrings[0]);	//get pos list of this DocID
@@ -169,8 +166,7 @@ public class QueryResults {
 				pos.put(lineStrings[1], wordPos);
 			}
 			
-			/* store TF into the map */
-		
+			/* store TF into the map */		
 			if ( getTermTFs().containsKey(term) ) {				
 				HashMap<String,Float> tfs = getTermTFs().get(term);
 				tfs.put(lineStrings[0], Float.parseFloat(lineStrings[2]));
@@ -191,7 +187,6 @@ public class QueryResults {
 	/* Read from file DocumentsFile.txt from position posStart for bytesLength bytes */
 	private void getDocFromDocumentsFile(int posStart, int bytesLength) throws IOException {
 		RandomAccessFile file = new RandomAccessFile("DocumentsFile.txt", "r");
-
 		file.seek(posStart);
 
 		while(file.getFilePointer() < posStart+bytesLength) {
@@ -210,6 +205,11 @@ public class QueryResults {
 		return getTermDFs().get(term);
 	}
 
+	/* return tfs.get(docID);   
+	 * 
+	 * insert these ifs cause of some exceptions.
+	 * check if documentsID list is correct or not.
+	 */
 	public static float getTermTFInDoc(String term, String docID) {
 		
 		if ( termDFs.containsKey(term)) { 

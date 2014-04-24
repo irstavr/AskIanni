@@ -38,7 +38,7 @@ public class OKAPIBM25 implements RetrievalModel {
             	docScores.put(docID, new Double(score) );
             }
         }
-        //ScoreEntry[] results = (ScoreEntry[]) scores.toArray(new ScoreEntry[scores.size()]);        
+        //ScoreEntry[] results = (ScoreEntry[]) scores.toArray(new ScoreEntry[scores.size()]);     
   
         return docScores;
     }
