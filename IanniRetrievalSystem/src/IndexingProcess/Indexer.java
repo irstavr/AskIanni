@@ -51,7 +51,7 @@ public class Indexer {
 		documents = parser.getDocsList();
 		vocabulary = parser.getVocabulary();
 		maxtfdoc = parser.getMaxtfdoc();
-		System.out.println("MAX : " + Collections.max(maxtfdoc.values()));
+		//System.out.println("MAX : " + Collections.max(maxtfdoc.values()));
 		createAllFiles();
 		stop = System.currentTimeMillis();
 		printNumOfDiffWords();
@@ -83,7 +83,7 @@ public class Indexer {
 		for (Entry<String, Word> vocEntry : vocabulary.entrySet()) {
 			String wordStr = vocEntry.getKey();
 			Word word = vocEntry.getValue();
-		//	System.out.printf("Word : %-15s \tDocument Frequency : %3d\n", wordStr , word.getDocFreq());
+			//System.out.printf("Word : %-15s \tDocument Frequency : %3d\n", wordStr , word.getDocFreq());
 			for (Entry<Long, ArrayList<Integer>> entry : word.getDocPosMap()
 					.entrySet()) {
 				Long docId = entry.getKey();
