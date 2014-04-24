@@ -35,23 +35,23 @@ public class VectorSpaceModel implements RetrievalModel {
 		// creates vector
 		for(int i = 0; i<token.length; i++)
 		{
-			System.out.println("Token : " + token[i]);
 			QueryGUI.addToQmap(token[i]);
 
-			float qTf = QueryGUI.getqMapTF(token[i])
-					/ (float) QueryGUI.getqMaxFreq();
+			float qTf = QueryGUI.getqMapTF(token[i]) / (float) QueryGUI.getqMaxFreq();
 			double qIdf = 0;
-			if(QueryResults.getTermDFs().get(token[i])!=null)
-			 qIdf = calcInverdedDF(QueryResults.getTermDF(token[i]));
+			
+			if( QueryResults.getTermDFs().get(token[i])!=null ) {
+				qIdf = calcInverdedDF(QueryResults.getTermDF(token[i]));
+			}
 			double queryWeight = qTf * qIdf;
 			this.addqTermMap(token[i], queryWeight);
 
-			HashMap<String, HashMap<String, Float>> termTFs = QueryResults
-					.getTermTFs();
-			for (String term : termTFs.keySet()) {
-				
+			HashMap<String, HashMap<String, Float>> termTFs = QueryResults.getTermTFs();
+			
+			for (String term : termTFs.keySet()) {				
 				double termIdf = calcInverdedDF(QueryResults.getTermDF(term));
 				HashMap<String, Float> termDocTfs = termTFs.get(term);
+				
 				for (String docID : termDocTfs.keySet()) {
 					double termWeight = termDocTfs.get(docID) * termIdf;
 					addTermMap(docID, token[i], termWeight);
@@ -64,8 +64,7 @@ public class VectorSpaceModel implements RetrievalModel {
 		double wVectLen = 0, qVectLen = queryVectorLength();
 		double finalScore = 0;
 
-		for(int i = 0; i<token.length; i++)
-		{
+		for(int i = 0; i<token.length; i++)	{
 			for (String docID : this.termWeights.keySet()) {
 				if (this.termWeights.get(docID).get(token[i]) != null) {
 					innerProduct += this.termWeights.get(docID).get(token[i])* this.qTermWeights.get(token[i]);
@@ -183,20 +182,11 @@ public class VectorSpaceModel implements RetrievalModel {
 		 );
 
 	     Collections.reverse(list);
-	     /*   for (int i=0;i<list.size();i++)
-	     {
-	    	 System.out.println("list i : " + list.get(i));
-	     }*/
 	     
 	     Map<K, V> result = new LinkedHashMap<K, V>();
-	     for (Map.Entry<K, V> entry : list)
-	     {
-	    	 //System.out.println("entry key : " + entry.getKey() + "entry val : " + entry.getValue());
+	     for (Map.Entry<K, V> entry : list) {
 	         result.put( entry.getKey(), entry.getValue() );
 	     }
-	     
-	     //for(K s : result.keySet())
-	    	// System.out.println("String s " + s );
 	     return result;
 	 }
 	 

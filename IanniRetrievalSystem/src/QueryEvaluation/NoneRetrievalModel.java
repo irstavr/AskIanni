@@ -20,6 +20,8 @@ public class NoneRetrievalModel implements RetrievalModel{
         while (it.hasNext()) {
         	String id = it.next();
         	scores.put(id, (double) 1);
+			System.out.println("id"+id+ " 1:"+1);
+
         }
         return scores;
 	}

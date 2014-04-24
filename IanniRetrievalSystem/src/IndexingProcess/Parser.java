@@ -45,28 +45,21 @@ public class Parser {
 		parse("documentCollection");
 
 		docFile.close();
-		// stop words analyzer
-		stopWordsAnalyzer();
+
 		// run stemmer
 		runStemmer();
-
 	}
 
 	private void runStemmer() {
 		Stemmer.Initialize();
-		// px
-		Stemmer.Stem("end");
 	}
 
-	private void stopWordsAnalyzer() {
-		// parse file and erase stop words
-	}
 
 	/* parsing files and erase every whitespace,number,sign */
 	private void parse(String directory) throws IOException {
 		File dir = new File(directory);
 
-		String delimiter = "\t\n\r\f\b!@#$%^&*;:'\\\".,0123456789()_-[]{}<>?|~`+-=/ \\'«»§΄―—’‘–°·";
+		String delimiter = "\\s+\t\n\r\f\b!@#$%^&*;:'\\\".,0123456789()_-[]{}<>?|~`+-=/ \\'«»§΄―—’‘–°·";
 		Word word = null;
 		int prevPos, nextPos = 0;
 		int maxFreq = 0;

@@ -210,6 +210,8 @@ public class QueryGUI {
         /* Stop counting time */
         stop = System.currentTimeMillis();
 
+        //QueryResults.clearAll();
+        
         /* Print Statistics */
         printStatistics(stop - start, res);
 	}
