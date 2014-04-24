@@ -209,7 +209,7 @@ public class QueryGUI {
         
         /* Stop counting time */
         stop = System.currentTimeMillis();
-
+        
         /* Print Statistics */
         printStatistics(stop - start, res);
 	}
