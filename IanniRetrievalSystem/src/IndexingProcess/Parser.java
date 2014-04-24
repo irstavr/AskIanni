@@ -58,12 +58,7 @@ public class Parser {
 	/* parsing files and erase every whitespace,number,sign */
 	private void parse(String directory) throws IOException {
 		File dir = new File(directory);
-
-<<<<<<< HEAD
 		String delimiter = "\\s+\t\n\r\f\b!@#$%^&*;:'\\\".,0123456789()_-[]{}<>?|~`+-=/ \\'«»§΄―—’‘–°·";
-=======
-		String delimiter = "\t\n\r\f\b!@#$%^&*;:'\\\".,0123456789()_-[]{}<>?|~`+-=/ \\'«»§΄―—’‘–°· ";
->>>>>>> upstream/master
 		Word word = null;
 		
 		int maxFreq = 0;
