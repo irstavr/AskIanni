@@ -182,12 +182,6 @@ public class VectorSpaceModel implements RetrievalModel {
 		         }
 		     } 
 		 );
-
-	   //  Collections.reverse(list);
-	     /*   for (int i=0;i<list.size();i++)
-	     {
-	    	 System.out.println("list i : " + list.get(i));
-	     }*/
 	     
 	     Map<K, V> result = new LinkedHashMap<K, V>();
 	     for (Map.Entry<K, V> entry : list) {

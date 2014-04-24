@@ -93,16 +93,15 @@ public class QueryResults {
 		Map<String, Double> scores = model.evaluateQuery(terms);
 		
 		/* print infos to the GUI */
-		//Iterator<Entry<String,String>> it = docsIDPathMap.entrySet().iterator();
 		Iterator<Entry<String,Double>> it = scores.entrySet().iterator();
 
 		while (it.hasNext()) {
 			Entry<String,Double> entry =  it.next();
-			//System.out.println("aba: "+entry.getKey());
+
 			results.add(entry.getKey()+ " " + 							/* docId */
 						docsIDPathMap.get(entry.getKey()) + " " + 		/* path */
 						entry.getValue() + " " + 						/* score */
-						getSnippet(docsIDPathMap.get(entry.getKey()),entry.getKey()));	/* snippet */
+						getSnippet( docsIDPathMap.get(entry.getKey()), entry.getKey() ) );	/* snippet */
 		}
 		
 		return QueryResults.results;
@@ -122,7 +121,7 @@ public class QueryResults {
 				HashMap<String, ArrayList<Long>> docPos = pos.get(word);
 				
 				if ( docPos.containsKey(docID) ) {
-					/* get the positions of the query word ( ONE WORD ) on this doc */
+					/* Get the positions of the query word ( ONE WORD ) on this doc */
 					ArrayList<Long> positions = docPos.get(docID);
 					
 					/* get just one example of the positions */
@@ -196,7 +195,6 @@ public class QueryResults {
             String[] lineStrings = line.split("\\s+");
             
 			docsIDPathMap.put(lineStrings[0], lineStrings[1]);	/* add the docID with its path to the map */
-			System.out.println("id "+lineStrings[0]+ " path: "+lineStrings[1]);
 			setSumDocLength(getSumDocLength() + Integer.parseInt(lineStrings[3]));
 		}
 		file.close();
@@ -207,22 +205,10 @@ public class QueryResults {
 		return getTermDFs().get(term);
 	}
 
-	/* return tfs.get(docID);   
-	 * 
-	 * insert these ifs cause of some exceptions.
-	 * check if documentsID list is correct or not.
-	 */
+	
 	public static float getTermTFInDoc(String term, String docID) {
-		
-		if ( termDFs.containsKey(term)) { 
-			HashMap<String,Float> tfs = termTFs.get(term);
-			if ( tfs.containsKey(docID)) {
-				return tfs.get(docID);
-			}
-			return 0;
-		} else {
-			return 0;
-		}
+		HashMap<String,Float> tfs = termTFs.get(term);
+		return tfs.get(docID);
 	}
 
 	/**
@@ -259,17 +245,5 @@ public class QueryResults {
 
 	public void setSumDocLength(int sumDocLength) {
 		QueryResults.sumDocLength = sumDocLength;
-	}
-
-	public static void clearAll() {
-		QueryResults.query = "";
-		QueryResults.results.clear();
-		QueryResults.voc.clear();
-		QueryResults.docsIDPathMap.clear();
-		QueryResults.wordPos.clear();
-		QueryResults.pos.clear();
-		QueryResults.getTermDFs().clear();
-		QueryResults.getTermTFs().clear();
-		QueryResults.sumDocLength = 0;
 	}
 }
