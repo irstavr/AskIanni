@@ -8,7 +8,6 @@ import java.io.PrintStream;
 import java.io.RandomAccessFile;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.TreeMap;
@@ -62,14 +61,12 @@ public class Indexer {
 	}
 
 	/* Returns the size of keys of the index (sum of diff words) */
-	private static void printNumOfDiffWords(
-			) {
+	private static void printNumOfDiffWords() {
 		System.out.println("#Num_of_diff_words: " + vocabulary.size());
 	}
 
 
 	private static void createAllFiles() throws IOException {
-
 		int nextPos = 0;
 		int prevPos = 0;
 		RandomAccessFile postingFile = new RandomAccessFile(POSTING, "rw");
@@ -83,12 +80,10 @@ public class Indexer {
 		for (Entry<String, Word> vocEntry : vocabulary.entrySet()) {
 			String wordStr = vocEntry.getKey();
 			Word word = vocEntry.getValue();
-			//System.out.printf("Word : %-15s \tDocument Frequency : %3d\n", wordStr , word.getDocFreq());
-			for (Entry<Long, ArrayList<Integer>> entry : word.getDocPosMap()
-					.entrySet()) {
+
+			for (Entry<Long, ArrayList<Integer>> entry : word.getDocPosMap().entrySet()) {
 				Long docId = entry.getKey();
 				ArrayList<Integer> docPosList = entry.getValue();
-				// System.out.print ("Doc ID  " + entry.getKey() + " ");
 
 				postingFile.write(Long.toString(docId).getBytes(
 						Charset.forName("UTF-8")));
@@ -96,8 +91,7 @@ public class Indexer {
 						.forName("UTF-8")));
 				Float termFreq = (float) (word.getWordFreqMap().get(docId)
 						.getTF() / (float) maxtfdoc.get(docId));
-				postingFile.write(Float.toString(termFreq).getBytes(
-						Charset.forName("UTF-8")));
+				postingFile.write(Float.toString(termFreq).getBytes(Charset.forName("UTF-8")));
 				postingFile.write((" " + Integer.toString(documents.get(docId)
 						.getDocsLinePos())).getBytes(Charset.forName("UTF-8")));
 				postingFile
@@ -117,22 +111,13 @@ public class Indexer {
 	
 			vocabularyFile.write((wordStr + " ").getBytes(Charset.forName("UTF-8")));
 
-			vocabularyFile.write(Integer.toString(word.getDocFreq()).getBytes(
-					Charset.forName("UTF-8")));
-			vocabularyFile.write((" " + Integer.toString(prevPos))
-					.getBytes(Charset.forName("UTF-8")));
-			vocabularyFile.write((" " + Integer.toString(nextPos - prevPos))
-					.getBytes(Charset.forName("UTF-8")));
-			//vocabularyFile.write("\n".getBytes("UTF-8"));
+			vocabularyFile.write(Integer.toString(word.getDocFreq()).getBytes(Charset.forName("UTF-8")));
+			vocabularyFile.write((" " + Integer.toString(prevPos)).getBytes(Charset.forName("UTF-8")));
+			vocabularyFile.write((" " + Integer.toString(nextPos - prevPos)).getBytes(Charset.forName("UTF-8")));
 			vocabularyFile.write(System.getProperty("line.separator").getBytes(
 					Charset.forName("UTF-8")));
 		}
 		
-		
-		//vocabularyFile.write("ΓΙΑΝΝΗΣ".getBytes(Charset.forName("UTF-8")));
-	/*	vocabulary.clear();
-		documents.clear();
-		maxtfdoc.clear();*/
 		postingFile.close();
 		vocabularyFile.close();
 		
@@ -151,8 +136,6 @@ public class Indexer {
 	}
 
 	private static void readFromFile(String filePath, int position, int size)	throws IOException {
-
-
 		RandomAccessFile file = new RandomAccessFile("documentCollection/Ulysses.txt", "rw");
 		file.seek(position);
 		byte[] bytes = new byte[size];
@@ -161,9 +144,7 @@ public class Indexer {
 		String s = new String(bytes, "UTF-8");
 		System.out.println(s);
 
-		file.close();
-
-	
+		file.close();	
 	}
 
 

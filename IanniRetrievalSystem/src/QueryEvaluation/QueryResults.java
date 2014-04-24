@@ -12,29 +12,29 @@ import java.util.Map.Entry;
 import mitos.stemmer.Stemmer;
 
 public class QueryResults {
-	String query;
-	private ArrayList<String> results;
-	HashMap<String,VocabularyEntry> voc;
-	ScoreEntry[] scoreEntry;
-	RetrievalModel model;
-	private HashMap<String,String> docsIDPathMap;						/* key: docID, value: path */
+	private static String query;
+	private static ArrayList<String> results;
+	private static HashMap<String,VocabularyEntry> voc;
+	//private static ScoreEntry[] scoreEntry;
+	private static RetrievalModel model;
+	private static HashMap<String,String> docsIDPathMap;					/* key: docID, value: path */
 	
-	private HashMap<String,ArrayList<Long>> wordPos;					/* key: docID, value: positions of this word in it 	*/
-	private HashMap<String, HashMap<String, ArrayList<Long>>> pos;		/* key: word, value: map<DocID,list<pos>> */
+	private static HashMap<String,ArrayList<Long>> wordPos;					/* key: docID, value: positions of this word in it 	*/
+	private static HashMap<String, HashMap<String, ArrayList<Long>>> pos;	/* key: word, value: map<DocID,list<pos>> */
 	
 	private static HashMap<String,Float> termDFs;						/* key: term string, value: its df 					*/
 	private static HashMap<String,HashMap<String,Float>> termTFs;		/* key: term , value: map<docID,tf>					*/
 	private static int sumDocLength;
 
 	public QueryResults(HashMap<String,VocabularyEntry> voc, RetrievalModel model, String query) throws IOException {
-		this.voc = voc;
-		this.model = model;
-		this.query = query;
-		this.results = new ArrayList<String>();
-        this.scoreEntry = null;
-        this.docsIDPathMap = new HashMap<String,String>();
-        this.wordPos = new HashMap<String,ArrayList<Long>>();
-        this.pos = new HashMap<String, HashMap<String, ArrayList<Long>>>();
+		QueryResults.voc = voc;
+		QueryResults.model = model;
+		QueryResults.query = query;
+		QueryResults.results = new ArrayList<String>();
+		//QueryResults.scoreEntry = null;
+		QueryResults.docsIDPathMap = new HashMap<String,String>();
+		QueryResults.wordPos = new HashMap<String,ArrayList<Long>>();
+		QueryResults.pos = new HashMap<String, HashMap<String, ArrayList<Long>>>();
         QueryResults.setTermDFs(new HashMap<String,Float>());
         QueryResults.setTermTFs(new HashMap<String, HashMap<String,Float> >());
         QueryResults.sumDocLength = 0;
@@ -53,8 +53,8 @@ public class QueryResults {
         while (tokenized.hasMoreTokens()) {
             String token = tokenized.nextToken();
             token = Stemmer.Stem(token);
-            System.out.println(token);
-            tokens[i++] = token;
+            tokens[i] = token;
+            i++;
         }
         return tokens;
     }
@@ -67,7 +67,7 @@ public class QueryResults {
 		for ( int i=0; i<terms.length; i++ ) {
 						
 			// Find term on vocabulary and its datas
-			VocabularyEntry term = this.voc.get(terms[i]);
+			VocabularyEntry term = QueryResults.voc.get(terms[i]);
 
 			/* if term is not found -- none results! */
 			if ( term != null ) {
@@ -93,27 +93,18 @@ public class QueryResults {
 		Map<String, Double> scores = model.evaluateQuery(terms);
 		
 		/* print infos to the GUI */
-		Iterator<Entry<String,String>> it = docsIDPathMap.entrySet().iterator();
-		
-/*		while (it.hasNext()) {
-			Entry<String,String> entry =  it.next();
-			
-			results.add(entry.getKey()+ " " + 							 docId 
-						entry.getValue() + " " + 						 path 
-						scores.get(entry.getKey()) + " " + 				 score 
-						getSnippet(entry.getValue(),entry.getKey()));	 snippet 
-		}*/
-		
-		for(String s : scores.keySet())
-		{
-			System.out.println("DOC ID : " + s);
-			System.out.println("PATh : " + docsIDPathMap.get(s));
-			System.out.println("SCORE : " + scores.get(s));
-			
-			
+		Iterator<Entry<String,Double>> it = scores.entrySet().iterator();
+
+		while (it.hasNext()) {
+			Entry<String,Double> entry =  it.next();
+
+			results.add(entry.getKey()+ " " + 							/* docId */
+						docsIDPathMap.get(entry.getKey()) + " " + 		/* path */
+						entry.getValue() + " " + 						/* score */
+						getSnippet( docsIDPathMap.get(entry.getKey()), entry.getKey() ) );	/* snippet */
 		}
-		//System.out.println("Size of results : "  + scores.size());
-		return this.results;
+		
+		return QueryResults.results;
 	}
 
 	/* Retrieves from this docID located at this path, a snippet that contains the query word */
@@ -130,7 +121,7 @@ public class QueryResults {
 				HashMap<String, ArrayList<Long>> docPos = pos.get(word);
 				
 				if ( docPos.containsKey(docID) ) {
-					/* get the positions of the query word ( ONE WORD ) on this doc */
+					/* Get the positions of the query word ( ONE WORD ) on this doc */
 					ArrayList<Long> positions = docPos.get(docID);
 					
 					/* get just one example of the positions */
@@ -202,9 +193,8 @@ public class QueryResults {
 		while(file.getFilePointer() < posStart+bytesLength) {
             String line = file.readLine();
             String[] lineStrings = line.split("\\s+");
-            docsIDPathMap.put(lineStrings[0], lineStrings[1]);
-				/* add the docID with its path to the map */
-		//	System.out.println("Size : " + docsIDPathMap.size());
+            
+			docsIDPathMap.put(lineStrings[0], lineStrings[1]);	/* add the docID with its path to the map */
 			setSumDocLength(getSumDocLength() + Integer.parseInt(lineStrings[3]));
 		}
 		file.close();
@@ -215,22 +205,10 @@ public class QueryResults {
 		return getTermDFs().get(term);
 	}
 
-	/* return tfs.get(docID);   
-	 * 
-	 * insert these ifs cause of some exceptions.
-	 * check if documentsID list is correct or not.
-	 */
+	
 	public static float getTermTFInDoc(String term, String docID) {
-		
-		if ( termDFs.containsKey(term)) { 
-			HashMap<String,Float> tfs = termTFs.get(term);
-			if ( tfs.containsKey(docID)) {
-				return tfs.get(docID);
-			}
-			return 0;
-		} else {
-			return 0;
-		}
+		HashMap<String,Float> tfs = termTFs.get(term);
+		return tfs.get(docID);
 	}
 
 	/**
