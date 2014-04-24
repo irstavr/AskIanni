@@ -51,7 +51,7 @@ public class Indexer {
 		documents = parser.getDocsList();
 		vocabulary = parser.getVocabulary();
 		maxtfdoc = parser.getMaxtfdoc();
-		System.out.println("MAX : " + Collections.max(maxtfdoc.values()));
+		//System.out.println("MAX : " + Collections.max(maxtfdoc.values()));
 		createAllFiles();
 		stop = System.currentTimeMillis();
 		printNumOfDiffWords();

@@ -26,7 +26,7 @@ public class Parser {
 	private HashMap<String, Integer> stopWords;
 	private HashMap<Long, Short> maxtfdoc;
 	RandomAccessFile docFile;
-
+	private int  prevPos, nextPos = 0;
 	/* accepts as a parameter the file to parse and the stop words to use */
 	public Parser() throws IOException {
 		this.docsMap = new HashMap<Long, Document>();
@@ -59,9 +59,13 @@ public class Parser {
 	private void parse(String directory) throws IOException {
 		File dir = new File(directory);
 
+<<<<<<< HEAD
 		String delimiter = "\\s+\t\n\r\f\b!@#$%^&*;:'\\\".,0123456789()_-[]{}<>?|~`+-=/ \\'«»§΄―—’‘–°·";
+=======
+		String delimiter = "\t\n\r\f\b!@#$%^&*;:'\\\".,0123456789()_-[]{}<>?|~`+-=/ \\'«»§΄―—’‘–°· ";
+>>>>>>> upstream/master
 		Word word = null;
-		int prevPos, nextPos = 0;
+		
 		int maxFreq = 0;
 		int i =0,wordPos=0;
 		
@@ -138,15 +142,17 @@ public class Parser {
 
 				prevPos = nextPos;
 				nextPos = (int) docFile.length();
+				
 				d.setDocsLineSize(nextPos - prevPos);
 				d.setDocsLinePos(prevPos);
-
+				
 				docsMap.put(d.getDocumentID(), d);
 			} else {
 				parse(f.getAbsolutePath());
 			}
 		}
 
+		
 	}
 
 	/* Returns a list of all the stop words from both GR+EN files */

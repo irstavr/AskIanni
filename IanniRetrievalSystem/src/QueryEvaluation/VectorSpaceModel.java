@@ -46,13 +46,23 @@ public class VectorSpaceModel implements RetrievalModel {
 			double queryWeight = qTf * qIdf;
 			this.addqTermMap(token[i], queryWeight);
 
+<<<<<<< HEAD
 			HashMap<String, HashMap<String, Float>> termTFs = QueryResults.getTermTFs();
 			
 			for (String term : termTFs.keySet()) {				
 				double termIdf = calcInverdedDF(QueryResults.getTermDF(term));
+=======
+			HashMap<String, HashMap<String, Float>> termTFs = QueryResults
+					.getTermTFs();
+			for (String term : termTFs.keySet()) {
+				//System.out.print("Term :  " + term + "\t");
+				double termIdf = calcInverdedDF(QueryResults.getTermDF(
+						term));
+>>>>>>> upstream/master
 				HashMap<String, Float> termDocTfs = termTFs.get(term);
 				
 				for (String docID : termDocTfs.keySet()) {
+				//	System.out.print("Doc : " + docID);
 					double termWeight = termDocTfs.get(docID) * termIdf;
 					addTermMap(docID, token[i], termWeight);
 				}
@@ -176,12 +186,20 @@ public class VectorSpaceModel implements RetrievalModel {
 		 Collections.sort( list, new Comparator<Map.Entry<K, V>>() {
 		         public int compare( Map.Entry<K, V> o1, Map.Entry<K, V> o2 )
 		         {
-		             return (o1.getValue()).compareTo( o2.getValue() );
+		             return (o2.getValue()).compareTo( o1.getValue() );
 		         }
 		     } 
 		 );
 
+<<<<<<< HEAD
 	     Collections.reverse(list);
+=======
+	   //  Collections.reverse(list);
+	     /*   for (int i=0;i<list.size();i++)
+	     {
+	    	 System.out.println("list i : " + list.get(i));
+	     }*/
+>>>>>>> upstream/master
 	     
 	     Map<K, V> result = new LinkedHashMap<K, V>();
 	     for (Map.Entry<K, V> entry : list) {

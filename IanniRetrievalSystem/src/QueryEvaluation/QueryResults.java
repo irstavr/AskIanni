@@ -93,6 +93,7 @@ public class QueryResults {
 		Map<String, Double> scores = model.evaluateQuery(terms);
 		
 		/* print infos to the GUI */
+<<<<<<< HEAD
 		//Iterator<Entry<String,String>> it = docsIDPathMap.entrySet().iterator();
 		Iterator<Entry<String,Double>> it = scores.entrySet().iterator();
 
@@ -106,6 +107,29 @@ public class QueryResults {
 		}
 		
 		return QueryResults.results;
+=======
+		Iterator<Entry<String,String>> it = docsIDPathMap.entrySet().iterator();
+		
+/*		while (it.hasNext()) {
+			Entry<String,String> entry =  it.next();
+			
+			results.add(entry.getKey()+ " " + 							 docId 
+						entry.getValue() + " " + 						 path 
+						scores.get(entry.getKey()) + " " + 				 score 
+						getSnippet(entry.getValue(),entry.getKey()));	 snippet 
+		}*/
+		
+		for(String s : scores.keySet())
+		{
+			System.out.println("DOC ID : " + s);
+			System.out.println("PATh : " + docsIDPathMap.get(s));
+			System.out.println("SCORE : " + scores.get(s));
+			
+			
+		}
+		//System.out.println("Size of results : "  + scores.size());
+		return this.results;
+>>>>>>> upstream/master
 	}
 
 	/* Retrieves from this docID located at this path, a snippet that contains the query word */
@@ -152,7 +176,7 @@ public class QueryResults {
 						
 			byte[] bytes = lineStrings[1].getBytes("UTF-8");
 			String term = new String(bytes,"UTF-8");
-						
+			
 			for (int i=5; i< lineStrings.length; i++) {
 				if ( wordPos.containsKey(lineStrings[0]) ) {
 					ArrayList<Long> pos = wordPos.get(lineStrings[0]);	//get pos list of this DocID
@@ -180,6 +204,7 @@ public class QueryResults {
 			}			
 			
 			/* Get the infos from DocumentsFile */
+			//System.out.println("PosStart : " + lineStrings[3] + "byteslen : " + lineStrings[4]); 
 			getDocFromDocumentsFile(Integer.parseInt(lineStrings[3]), Integer.parseInt(lineStrings[4]));
 		}		
 		file.close();		
@@ -189,14 +214,20 @@ public class QueryResults {
 	private void getDocFromDocumentsFile(int posStart, int bytesLength) throws IOException {
 		RandomAccessFile file = new RandomAccessFile("DocumentsFile.txt", "r");
 		file.seek(posStart);
-
+		//System.out.println("PosStart : " + posStart + "byteslen : " + bytesLength); 
 		while(file.getFilePointer() < posStart+bytesLength) {
             String line = file.readLine();
             String[] lineStrings = line.split("\\s+");
+<<<<<<< HEAD
 			
 			docsIDPathMap.put(lineStrings[0], lineStrings[1]);	/* add the docID with its path to the map */
 			System.out.println("id "+lineStrings[0]+ " path: "+lineStrings[1]);
 			
+=======
+            docsIDPathMap.put(lineStrings[0], lineStrings[1]);
+				/* add the docID with its path to the map */
+		//	System.out.println("Size : " + docsIDPathMap.size());
+>>>>>>> upstream/master
 			setSumDocLength(getSumDocLength() + Integer.parseInt(lineStrings[3]));
 		}
 		file.close();
