@@ -2,14 +2,12 @@ package IndexingProcess;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 
 /* Models the words of a Document */
 public class Word {
 	private String word;						 				/* value of word */
-	private Integer docFreq;						 				/* the sum of Documents that we can find this word in */
-	private short maxTF;
-	private HashMap<Long,WordFrequency> wordFreqMap;				 				/* the sum of occurrences of this word */
+	private Integer docFreq;						 			/* the sum of Documents that we can find this word in */
+	private HashMap<Long,WordFrequency> wordFreqMap;			/* the sum of occurrences of this word */
 	private ArrayList<Integer> posList;	 						/* the map of Documents that this word exists in and the list of positions in this Document*/
 	private HashMap<Long, ArrayList<Integer>> docPosMap;
 	private HashMap<Long,Short> maxTFDoc;
@@ -96,7 +94,6 @@ public class Word {
 	}
 
 	public void setMaxTF(short maxTF) {
-		this.maxTF = maxTF;
 	}
 
 	public HashMap<Long,Short>  getMaxTFDoc() {

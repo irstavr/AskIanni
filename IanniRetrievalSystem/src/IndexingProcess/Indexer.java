@@ -2,7 +2,6 @@ package IndexingProcess;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
@@ -11,11 +10,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Map;
 import java.util.Map.Entry;
-import java.util.SortedSet;
 import java.util.TreeMap;
 
 /* This class builds the inverted index.
@@ -34,7 +29,6 @@ public class Indexer {
 	private static final String VOCABULARY = "VocabularyFile.txt";
 	private static final String POSTING = "PostingFile.txt";
 
-	private static File[] inputFiles;
 	private static HashMap<Long, Document> documents;
 	private static TreeMap<String, Word> vocabulary;
 	private static HashMap<Long, Short> maxtfdoc;

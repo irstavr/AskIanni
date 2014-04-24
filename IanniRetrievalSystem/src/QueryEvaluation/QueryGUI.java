@@ -5,9 +5,11 @@ import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 
 import javax.swing.ButtonGroup;
 import javax.swing.GroupLayout;
@@ -15,7 +17,6 @@ import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JProgressBar;
 import javax.swing.JRadioButton;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
@@ -23,21 +24,21 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 
 
 public class QueryGUI {
-
+	private static HashMap<String, MutableInt> qMap;
 	private JFrame frame;
 	private JTextField queryField;
 	private JTextArea textArea;
-	int retrievalModel = 0;
-	private static HashMap<String, MutableInt> qMap;
 	private static int qMaxFreq;
+	int retrievalModel = 0;
+
 	/**
 	 * Launch the application.
 	 */
-	public static void main(String[] args) {
+	public static void main(final HashMap<String,VocabularyEntry> vocabulary) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					QueryGUI window = new QueryGUI();
+					QueryGUI window = new QueryGUI(vocabulary);
 					window.frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -49,14 +50,14 @@ public class QueryGUI {
 	/**
 	 * Create the application.
 	 */
-	public QueryGUI() {
-		initialize();
+	public QueryGUI(HashMap<String,VocabularyEntry> vocabulary) {
+		initialize(vocabulary);
 	}
 
 	/**
 	 * Initialize the contents of the frame.
 	 */
-	private void initialize() {
+	private void initialize(final HashMap<String,VocabularyEntry> vocabulary) {
 		qMap = new HashMap<String, MutableInt>();
 		frame = new JFrame();
 		frame.getContentPane().setBackground(Color.DARK_GRAY);
@@ -72,9 +73,8 @@ public class QueryGUI {
 		SearchButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent evt) {
 				try {
-					SearchButtonActionPerformed(evt);
+					SearchButtonActionPerformed(evt,vocabulary);
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
@@ -110,8 +110,6 @@ public class QueryGUI {
             }
         });
 		buttonGroup.add(OKAPIButton);
-
-		JProgressBar progressBar = new JProgressBar();
 		
 		JLabel lblChooseRetrievalModel = new JLabel("Choose retrieval model:");
 		lblChooseRetrievalModel.setForeground(Color.LIGHT_GRAY);
@@ -128,7 +126,6 @@ public class QueryGUI {
 					.addContainerGap()
 					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
 						.addGroup(groupLayout.createSequentialGroup()
-							.addComponent(progressBar, GroupLayout.DEFAULT_SIZE, 853, Short.MAX_VALUE)
 							.addContainerGap())
 						.addGroup(groupLayout.createSequentialGroup()
 							.addComponent(getTextArea(), GroupLayout.DEFAULT_SIZE, 853, Short.MAX_VALUE)
@@ -166,59 +163,55 @@ public class QueryGUI {
 							.addGap(124)))
 					.addComponent(getTextArea(), GroupLayout.DEFAULT_SIZE, 74, Short.MAX_VALUE)
 					.addGap(18)
-					.addComponent(progressBar, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 					.addContainerGap())
 		);
 		frame.getContentPane().setLayout(groupLayout);
 	}
-		
-
-	protected void OKAPIButtonActionPerformed(ActionEvent evt) {
-		System.out.println("OKAPI Retrieval MOdel");
-		retrievalModel = 2;
-		
-	}
-
-	protected void VectorButtonActionPerformed(ActionEvent evt) {
-		System.out.println("Vector Retrieval MOdel");
-		retrievalModel = 1;
-	}
-
+	
 	protected void NoneModelButtonActionPerformed(ActionEvent evt) {
 		System.out.println("None Retrieval MOdel");
 		retrievalModel = 0;
 	}
-
-	protected void SearchButtonActionPerformed(ActionEvent evt) throws IOException {
-		Vocabulary voc = new Vocabulary();
-		HashMap<String,VocabularyEntry> vocabulary = new HashMap<String,VocabularyEntry>();
+	
+	protected void VectorButtonActionPerformed(ActionEvent evt) {
+		System.out.println("Vector Retrieval MOdel");
+		retrievalModel = 1;
+	}
+	
+	protected void OKAPIButtonActionPerformed(ActionEvent evt) {
+		System.out.println("OKAPI Retrieval MOdel");
+		retrievalModel = 2;	
+	}
+	
+	protected void SearchButtonActionPerformed(ActionEvent evt, HashMap<String,VocabularyEntry> vocabulary) throws IOException {
         RetrievalModel model = null;
 
         /* Start counting time */
         long start, stop;
         start = System.currentTimeMillis();
-        System.out.println("QueryEvaluator starts!");
 
-        /* Load Vocabulary from File into memory */
-        voc.setVocabulary("VocabularyFile.txt");
-        vocabulary = voc.getVocabulary();        
-
+        this.textArea.setEnabled(true);
+        this.textArea.setAutoscrolls(true);
+        this.textArea.setText("");
+        
         /* According to the selected Retrieval model by user, instantiate it */
         model = chooseRetrievalModel(retrievalModel, vocabulary);
 
         /* Get the query results */
         System.out.println(">Query: "+ queryField.getText());
-        QueryResults res = new QueryResults(this, vocabulary, model, queryField.getText());
-        res.createResults();
+        QueryResults res = new QueryResults(vocabulary, model, queryField.getText());
+        ArrayList<String> results = res.createResults();
 
-        getTextArea().setEnabled(true);
-                
+        Iterator<String> it = results.iterator();
+        while (it.hasNext()) {
+        	this.textArea.append(it.next()+"\n");
+        }
+        
         /* Stop counting time */
         stop = System.currentTimeMillis();
 
         /* Print Statistics */
         printStatistics(stop - start, res);
-        System.out.println("QueryEvaluator ends!");
 	}
 
 
@@ -257,47 +250,35 @@ public class QueryGUI {
 	public static int getqMapTF(String word) {
 		return qMap.get(word).get();
 	}
+	
 	public void setqMap(HashMap<String, MutableInt> qMap) {
-		this.qMap = qMap;
+		QueryGUI.qMap = qMap;
 	}
 	
 	public static void addToQmap(String word) {
 		MutableInt count = qMap.get(word);
 		
-		if(count == null)
-		{
+		if(count == null) {
 			qMap.put(word, new MutableInt());
-		}
-		else
-		{
+		} else {
 			qMap.get(word).increment();
 		}
-		//int maxValueInMap=(Collections.max(qMap.values()));
 		qMaxFreq = Collections.max(qMap.values(),new MyComparator()).get();
-		
 	}
 
-	protected static class MyComparator implements Comparator<MutableInt>
-	{
-
+	protected static class MyComparator implements Comparator<MutableInt> {
 		@Override
 		public int compare(MutableInt o1, MutableInt o2) {
-			// TODO Auto-generated method stub
-			if(o1.get() > o2.get())
-			{
+			if(o1.get() > o2.get()) {
 				return 1;
-			}
-			else if (o1.get()<o2.get())
-			{
+			} else if (o1.get()<o2.get()) {
 				return -1;
-			}
-			else
-			{
+			} else {
 				return 0;
 			}
 		}
-		
 	}
+	
 	public static float getqMaxFreq() {
 		return qMaxFreq;
 	}
@@ -305,6 +286,4 @@ public class QueryGUI {
 	public static void setqMaxFreq(int qMaxFreq) {
 		QueryGUI.qMaxFreq = qMaxFreq;
 	}
-	
-	
 }

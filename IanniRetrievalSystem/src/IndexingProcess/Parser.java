@@ -8,12 +8,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.RandomAccessFile;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.StringTokenizer;
 import java.util.TreeMap;
-import java.util.Map.Entry;
 
 import mitos.stemmer.Stemmer;
 
@@ -27,14 +24,12 @@ public class Parser {
 	private TreeMap<String, Word> vocabulary;
 	private File[] inputFiles;
 	private HashMap<String, Integer> stopWords;
-	private final static Charset ENCODING = StandardCharsets.UTF_8;
 	private HashMap<Long, Short> maxtfdoc;
 	RandomAccessFile docFile;
 
 	/* accepts as a parameter the file to parse and the stop words to use */
 	public Parser() throws IOException {
 		this.docsMap = new HashMap<Long, Document>();
-		this.inputFiles = inputFiles;
 		this.stopWords = readStopWordFiles();
 		this.setVocabulary(new TreeMap<String, Word>());
 		this.maxtfdoc = new HashMap<Long, Short>();
@@ -91,8 +86,7 @@ public class Parser {
 				// Create new Document for this file and add it to the list
 				Document d = new Document(f.getName(), f.getAbsolutePath());
 			
-				RandomAccessFile rafFile = new RandomAccessFile(
-						f.getAbsolutePath(), "rw");
+				//RandomAccessFile rafFile = new RandomAccessFile(f.getAbsolutePath(), "rw");
 				
 				wordPos = 0;
 				while ((line = bufReader.readLine()) != null) {

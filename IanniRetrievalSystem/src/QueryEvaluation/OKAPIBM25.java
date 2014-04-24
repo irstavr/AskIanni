@@ -19,14 +19,11 @@ public class OKAPIBM25 implements RetrievalModel {
 	}
 
     public HashMap<String,Double> evaluateQuery(String[] token) throws IOException {
-    	//Get num of docs
-    	int numDocs = Vocabulary.getNumOfDocuments();
-
     	//List with scores for every doc
     	HashMap<String,Double> docScores = new HashMap<String, Double>();
-    
-    	//Tokenize the query
-    	//String[] tokens = tokenizeQuery(query);
+    	
+    	//Get num of docs
+    	int numDocs = Vocabulary.getNumOfDocuments();
                 
     	double avgdl = Voc.getAvgdl();
         double score;
@@ -41,7 +38,7 @@ public class OKAPIBM25 implements RetrievalModel {
             	docScores.put(docID, new Double(score) );
             }
         }
-        //ScoreEntry[] results = (ScoreEntry[]) scores.toArray(new ScoreEntry[scores.size()]);        
+        //ScoreEntry[] results = (ScoreEntry[]) scores.toArray(new ScoreEntry[scores.size()]);     
   
         return docScores;
     }
@@ -51,7 +48,10 @@ public class OKAPIBM25 implements RetrievalModel {
 		double sum = 0;
         for (int i = 0; i < tokens.length; i++) {
             double d = ( numDocs - QueryResults.getTermDF(tokens[i]) + 0.5 ) / QueryResults.getTermDF(tokens[i]) + 0.5;
-            double idf = Math.log10(d);
+            double idf = Math.log(d) / Math.log(2);
+            
+            idf = Math.abs(idf);
+            
             double tf = QueryResults.getTermTFInDoc(tokens[i], docID);
             sum += idf * (tf * (k + 1.0)) / (tf + k * (1 - b + b * (numDocs / avgdl)));
         }
@@ -62,7 +62,8 @@ public class OKAPIBM25 implements RetrievalModel {
      * Tokenize the query into tokens
      * TOADD: stop words, stemming!
      */
-    private String[] tokenizeQuery(String query) {
+    @SuppressWarnings("unused")
+	private String[] tokenizeQuery(String query) {
         StringTokenizer tokenized = new StringTokenizer(query.toLowerCase());
         int numTokens = tokenized.countTokens();
         String[] tokens = new String[numTokens];

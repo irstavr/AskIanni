@@ -1,6 +1,5 @@
 package QueryEvaluation;
 
-import java.util.Comparator;
 
 /**
  * 
@@ -33,14 +32,8 @@ public class ScoreEntry implements Comparable<ScoreEntry> {
         this.score = score;
     }
 
-  
-
-
-
-
 	@Override
 	public int compareTo(ScoreEntry o) {
-		// TODO Auto-generated method stub
 		return o.getScore().compareTo(this.getScore());
 	}
 
