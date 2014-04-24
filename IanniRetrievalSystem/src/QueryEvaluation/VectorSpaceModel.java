@@ -48,15 +48,18 @@ public class VectorSpaceModel implements RetrievalModel {
 
 			HashMap<String, HashMap<String, Float>> termTFs = QueryResults.getTermTFs();
 			
-			for (String term : termTFs.keySet()) {				
-				double termIdf = calcInverdedDF(QueryResults.getTermDF(term));
+			for (String term : termTFs.keySet()) {			
+				if(QueryResults.getTermDFs().get(term)!=null)
+				{
+					double termIdf = calcInverdedDF(QueryResults.getTermDF(term));
 
-				HashMap<String, Float> termDocTfs = termTFs.get(term);
-				
-				for (String docID : termDocTfs.keySet()) {
-				//	System.out.print("Doc : " + docID);
-					double termWeight = termDocTfs.get(docID) * termIdf;
-					addTermMap(docID, token[i], termWeight);
+					HashMap<String, Float> termDocTfs = termTFs.get(term);
+					
+					for (String docID : termDocTfs.keySet()) {
+					//	System.out.print("Doc : " + docID);
+						double termWeight = termDocTfs.get(docID) * termIdf;
+						addTermMap(docID, token[i], termWeight);
+					}
 				}
 			}
 		}

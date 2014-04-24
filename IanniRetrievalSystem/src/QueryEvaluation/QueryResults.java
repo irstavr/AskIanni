@@ -51,16 +51,19 @@ public class QueryResults {
         int i = 0;
         while (tokenized.hasMoreTokens()) {
             String token = tokenized.nextToken();
-            token = Stemmer.Stem(token);
-            tokens[i] = token;
-            i++;
+            if(Vocabulary.getStopWords().get(token) ==null)
+            {
+            	token = Stemmer.Stem(token);
+            	tokens[i] = token;
+            	i++;
+            }
         }
         return tokens;
     }
     
 	public ArrayList<String> createResults() throws IOException {
 		
-		String[] terms = tokenizeQuery(query);
+		String[] terms = tokenizeQuery(query.toLowerCase());
 		
 		// tokenized query terms
 		for ( int i=0; i<terms.length; i++ ) {
