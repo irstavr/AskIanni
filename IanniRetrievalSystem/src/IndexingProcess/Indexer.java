@@ -39,25 +39,29 @@ public class Indexer {
 	public static void main(String[] args) throws IOException {
 
 		createFolder();
+		
+		long start, stop;
+		start = System.currentTimeMillis();
+
 		// B6. builds PostingFile
 		// It follows the parsing, stemming(B3) and analyzing
 		// of multiple documents (B2)
-		long start, stop;
-		start = System.currentTimeMillis();
 	
 		Parser parser = new Parser();
 		parser.readDocuments();
 		documents = parser.getDocsList();
 		vocabulary = parser.getVocabulary();
 		maxtfdoc = parser.getMaxtfdoc();
-		//System.out.println("MAX : " + Collections.max(maxtfdoc.values()));
-		createAllFiles();
-		stop = System.currentTimeMillis();
+
 		printNumOfDiffWords();
+		
+		createAllFiles();
+		
+		/* Count time */
+		stop = System.currentTimeMillis();
 		long fulltime = stop - start;
 		fulltime = (fulltime / 1000)% 60;
-		System.out.println(fulltime);
-
+		System.out.println("Time spent: "+fulltime);		
 	}
 
 	/* Returns the size of keys of the index (sum of diff words) */
@@ -116,6 +120,8 @@ public class Indexer {
 			vocabularyFile.write((" " + Integer.toString(nextPos - prevPos)).getBytes(Charset.forName("UTF-8")));
 			vocabularyFile.write(System.getProperty("line.separator").getBytes(
 					Charset.forName("UTF-8")));
+			
+			System.out.println("# " + wordStr+ ": " + word.getDocFreq());
 		}
 		
 		postingFile.close();
