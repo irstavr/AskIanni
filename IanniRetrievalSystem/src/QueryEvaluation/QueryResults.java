@@ -3,6 +3,7 @@ package QueryEvaluation;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -110,7 +111,6 @@ public class QueryResults {
 	private String getSnippet(String path, String docID) throws IOException {
 		RandomAccessFile file = new RandomAccessFile(path, "r");
 		String line = new String();
-		System.out.println("snippet: ");
 
 		System.out.println("file: "+path);
 		
@@ -125,34 +125,32 @@ public class QueryResults {
 				if ( docPos.containsKey(docID) ) {
 					/* Get the positions of the query word ( ONE WORD ) on this doc */
 					ArrayList<Long> positions = docPos.get(docID);
-					System.out.println("position: "+positions.get(0));
-
+					
+					//Sorting positions
+					Collections.sort(positions);
+					
 					for (Long pos : positions) {
 						
-						/* get just one example of the positions */
-						while (pos > 0) {
-							pos -= 1;
-						
-							file.seek(pos);
+						/* get just one example of the positions */						
+						file.seek(pos);
+						System.out.println("position: "+pos);
 
-							line = file.readLine();
-					        if ( line!=null) {
-						    	List<Integer> matches = new BoyerMooreAlg().match(word, line);
+				        if ( (line = file.readLine()) != null ) {
+					    	List<Integer> matches = new BoyerMooreAlg().match(word, line);
 
-						    	for (Integer integer : matches) {
-									System.out.println("Match at: " + integer);
-						    	}
-						    	break;
-					        }
-						}			        
-						
+					    	for (Integer integer : matches) {
+								System.out.println("Match at: " + integer);
+					    	}
+					    	file.close();
+							return line;
+				        }
 					}
 				}
 			}
 		}
 		file.close();
 
-		return line;
+		return "";
 	}
 
 	/* Read from file PostingFile.txt from position posStart for bytesLength bytes */
@@ -195,7 +193,6 @@ public class QueryResults {
 			}			
 			
 			/* Get the infos from DocumentsFile */
-			//System.out.println("PosStart : " + lineStrings[3] + "byteslen : " + lineStrings[4]); 
 			getDocFromDocumentsFile(Integer.parseInt(lineStrings[3]), Integer.parseInt(lineStrings[4]));
 		}		
 		file.close();		
@@ -224,7 +221,11 @@ public class QueryResults {
 	
 	public static float getTermTFInDoc(String term, String docID) {
 		HashMap<String,Float> tfs = termTFs.get(term);
-		return tfs.get(docID);
+		if ( tfs.containsKey(docID)) {
+			return tfs.get(docID);
+		} else {
+			return 0;
+		}
 	}
 
 	/**

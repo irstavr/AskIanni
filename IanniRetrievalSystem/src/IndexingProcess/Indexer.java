@@ -135,6 +135,7 @@ public class Indexer {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private static void readFromFile(String filePath, int position, int size)	throws IOException {
 		RandomAccessFile file = new RandomAccessFile("documentCollection/Ulysses.txt", "rw");
 		file.seek(position);

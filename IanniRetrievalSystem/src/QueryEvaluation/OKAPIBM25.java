@@ -10,7 +10,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.StringTokenizer;
 
 import mitos.stemmer.Stemmer;
 
@@ -52,8 +51,7 @@ public class OKAPIBM25 implements RetrievalModel {
     public  <K, V extends Comparable<? super V>> Map<K, V> sortByValue( Map<K, V> map ) {
 	     List<Map.Entry<K, V>> list = new LinkedList<Map.Entry<K, V>>( map.entrySet() );
 		 Collections.sort( list, new Comparator<Map.Entry<K, V>>() {
-		         public int compare( Map.Entry<K, V> o1, Map.Entry<K, V> o2 )
-		         {
+		         public int compare( Map.Entry<K, V> o1, Map.Entry<K, V> o2 ) {
 		             return (o2.getValue()).compareTo( o1.getValue() );
 		         }
 		     } 
@@ -78,23 +76,6 @@ public class OKAPIBM25 implements RetrievalModel {
             sum += idf * (tf * (k + 1.0)) / (tf + k * (1 - b + b * (numDocs / avgdl)));
         }
         return sum;
-    }
-
-    /*
-     * Tokenize the query into tokens
-     * TOADD: stop words, stemming!
-     */
-    @SuppressWarnings("unused")
-	private String[] tokenizeQuery(String query) {
-        StringTokenizer tokenized = new StringTokenizer(query.toLowerCase());
-        int numTokens = tokenized.countTokens();
-        String[] tokens = new String[numTokens];
-        int i = 0;
-        while (tokenized.hasMoreTokens()) {
-            String token = tokenized.nextToken();
-            tokens[i++] = token;
-        }
-        return tokens;
     }
 
 	@Override
