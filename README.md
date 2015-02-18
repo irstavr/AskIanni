@@ -1,4 +1,4 @@
 InformationRetrieval
 ====================
 
-Project for hy463(lesson in CSD UoC_
+Information Retrieval System 
