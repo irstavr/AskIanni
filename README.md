@@ -1,9 +1,10 @@
 AskIanni
 ====================
 
-AskIanni is a modern search engine for famous last words.
-It is a complete Information Retrieval System based on the Universal WordNet (UWN), 
-a big lexicographical database for various different languages.
+AskIanni is a modern search engine for famous last words!
+A complete Information Retrieval & crawler system for documents or web pages,
+based on the Universal WordNet (UWN), on of the biggest lexicographical databases
+for various different languages.
 
 AskIanni can support english and greek queries by the user on its search engine.
 It contains a query processor and ranking functions for sorting the results by taking into account 
