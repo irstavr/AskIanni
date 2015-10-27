@@ -12,6 +12,7 @@ For the best precision of the system, IanniRetrievalSystem takes advantage of th
 of the synonyms of every term into different 'senses'.
 
 Processes:
+
 Indexing (Vocabulary file, Posting file, Documents file)
 Query valuation (Vector Space Model, Okapi BM25)
 Query Processor (English & Greek queries, Optional term weight by user)
