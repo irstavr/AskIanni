@@ -14,9 +14,9 @@ of the synonyms of every term into different 'senses'.
 
 ## Processes: ##
 
- - [x]Indexing (Vocabulary file, Posting file, Documents file)
- - [x]Query valuation (Inverted index, Vector Space Model, Okapi BM25, Stemming)
- - [x]Query Processor (English & Greek queries, Optional term weight by user)
- - [x]Ranking Functions (based on UWN classification and user's weights on every term)
+ - [x] Indexing (Vocabulary file, Posting file, Documents file)
+ - [x] Query valuation (Inverted index, Vector Space Model, Okapi BM25, Stemming)
+ - [x] Query Processor (English & Greek queries, Optional term weight by user)
+ - [x] Ranking Functions (based on UWN classification and user's weights on every term)
 
 ### Ask 'Ianni' , 'it' knows ;) ###
