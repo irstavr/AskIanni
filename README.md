@@ -1,5 +1,5 @@
-AskIanni
-====================
+# AskIanni
+## ==================== ##
 
 AskIanni is a modern search engine for famous last words!
 A complete Information Retrieval & crawler system for documents or web pages,
@@ -12,7 +12,7 @@ the synonyms, hyponyms, meronyms of every word/phrase and their weights on the U
 For the best precision of the system, IanniRetrievalSystem takes advantage of the classification 
 of the synonyms of every term into different 'senses'.
 
-Processes:
+## Processes: ##
 
 Indexing (Vocabulary file, Posting file, Documents file)
 Query valuation (Inverted index, Vector Space Model, Okapi BM25, Stemming)
